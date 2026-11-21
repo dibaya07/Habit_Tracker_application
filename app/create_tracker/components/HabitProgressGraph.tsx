@@ -1,21 +1,23 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import ProgressLineGraph, { GraphDayPoint } from '@/components/tracker/ProgressLineGraph';
 import { DayLabelMode, Habit } from '@/lib/types/tracker';
 import { addUtcDays, getUtcDayNumber, getUtcWeekdayNarrow, parseUtcDate } from '@/lib/utils/date';
 
 interface HabitProgressGraphProps {
   habits: Habit[];
-  visibleDayCount: number;
+  durationDays: number;
+  // habits: Habit[];
+  // visibleDayCount: number;
   dayNumbers?: number[];
-  extraDaysCount: number;
+  // extraDaysCount: number;
   startDate: string;
   dayLabelMode: DayLabelMode;
   checkedCells: Record<string, boolean>;
   plottedZeroDays?: Record<number, boolean>;
-  onPlotPointClick?: (dayNum: number, count: number) => void;
-  onClearPoints?: () => void;
+  // onPlotPointClick?: (dayNum: number, count: number) => void;
+  // onClearPoints?: () => void;
   onRemoveGraph?: () => void;
   forceLight?: boolean;
   hideHint?: boolean;
@@ -23,19 +25,22 @@ interface HabitProgressGraphProps {
   rightSpacerClassName?: string;
   dayColMinWidthPx?: number;
   rightLabel?: string;
+   setCheckedCells?: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+    setPlottedZeroDays?: React.Dispatch<React.SetStateAction<Record<number, boolean>>>;
 }
 
 export default function HabitProgressGraph({
   habits,
-  visibleDayCount,
+  durationDays,
+  // visibleDayCount,
   dayNumbers,
-  extraDaysCount,
+  // extraDaysCount,
   startDate,
   dayLabelMode,
   checkedCells,
   plottedZeroDays = {},
-  onPlotPointClick,
-  onClearPoints,
+  // onPlotPointClick,
+  // onClearPoints,
   onRemoveGraph,
   forceLight = false,
   hideHint = false,
@@ -43,7 +48,18 @@ export default function HabitProgressGraph({
   rightSpacerClassName = 'w-[84px]',
   dayColMinWidthPx = 36,
   rightLabel,
+   setCheckedCells: externalSetCheckedCells,
+  setPlottedZeroDays: externalSetPlottedZeroDays,
 }: HabitProgressGraphProps) {
+
+  const visibleDayCount = Math.min(10, Math.max(1, durationDays));
+  const extraDaysCount = Math.max(0, durationDays - visibleDayCount);
+  const [internalCheckedCells, setInternalCheckedCells] = useState<Record<string, boolean>>({});
+    const [internalPlottedZeroDays, setInternalPlottedZeroDays] = useState<Record<number, boolean>>({});
+
+  const setCheckedCells = externalSetCheckedCells ?? setInternalCheckedCells;
+  const setPlottedZeroDays = externalSetPlottedZeroDays ?? setInternalPlottedZeroDays;
+
   const daysArray =
     dayNumbers && dayNumbers.length > 0
       ? dayNumbers
@@ -81,6 +97,46 @@ export default function HabitProgressGraph({
       completedCount,
     };
   });
+
+   const onPlotPointClick = (dayNum: number, targetCount: number) => {
+    let currentCount = 0;
+    habits.forEach((h) => {
+      if (checkedCells[`${h.id}-${dayNum}`]) currentCount += 1;
+    });
+
+    const isAlreadySameZero = targetCount === 0 && currentCount === 0 && plottedZeroDays[dayNum];
+    const isAlreadySameCount = targetCount > 0 && currentCount === targetCount;
+
+    setCheckedCells((prev) => {
+      const next = { ...prev };
+      habits.forEach((h, idx) => {
+        const key = `${h.id}-${dayNum}`;
+        if (isAlreadySameCount || targetCount === 0) {
+          delete next[key];
+        } else {
+          next[key] = idx < targetCount;
+        }
+      });
+      return next;
+    });
+
+    setPlottedZeroDays((prev) => {
+      const next = { ...prev };
+      if (targetCount === 0 && !isAlreadySameZero) {
+        next[dayNum] = true;
+      } else {
+        delete next[dayNum];
+      }
+      return next;
+    });
+  };
+
+   const onClearPoints = () => {
+    setCheckedCells({});
+    setPlottedZeroDays({});
+  };
+
+  
 
   return (
     <ProgressLineGraph

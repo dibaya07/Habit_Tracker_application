@@ -1,65 +1,21 @@
 import React from 'react';
 import { Calendar, CheckSquare, BarChart2, Heart } from 'lucide-react';
-import { SITE_CONFIG } from '../lib/data/site-config';
-import HeroPrimaryActions from './HeroPrimaryActions';
-import HeroFloatingElements, { HeroMobileFloatingStrip } from './HeroFloatingElements';
+import { SITE_CONFIG } from '../../lib/data/site-config';
+import HeroPrimaryActions from './components/HeroPrimaryActions';
+import HeroFloatingElements, { HeroMobileFloatingStrip } from './components/HeroFloatingElements';
+import BackgroundGraphics from './components/BackgroundGraphics';
+import HeroTagLines from './components/HeroTagLines';
 
-export const HeroSection: React.FC = () => {
+export const HeroSection = () => {
   return (
     <section className="relative overflow-hidden pt-12 pb-16 md:pt-20 md:pb-24 bg-gradient-to-b from-[#eef7f1] via-[#f7fbf8] to-[#fafcf9] dark:from-[#0a2319] dark:via-[#071b13] dark:to-[#071912]">
-      {/* Architectural Dot Matrix Backdrop with Smooth Radial Edge Fade */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(rgba(24,63,46,0.13)_1.2px,transparent_1.2px)] dark:bg-[radial-gradient(rgba(47,225,150,0.14)_1.2px,transparent_1.2px)] [background-size:26px_26px] [mask-image:radial-gradient(ellipse_85%_72%_at_50%_38%,#000_48%,transparent_100%)] z-0"
-      />
-
-      {/* Multi-Layered Luminous Ambient Aura */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-28 left-1/2 -translate-x-1/2 w-[920px] h-[480px] rounded-full bg-[radial-gradient(circle,rgba(47,225,150,0.28)_0%,rgba(16,185,129,0.08)_48%,transparent_72%)] dark:bg-[radial-gradient(circle,rgba(47,225,150,0.2)_0%,rgba(16,185,129,0.06)_50%,transparent_75%)] blur-2xl z-0"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute top-28 -left-24 w-80 h-80 rounded-full bg-emerald-300/25 dark:bg-emerald-500/12 blur-3xl z-0"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute top-32 -right-24 w-80 h-80 rounded-full bg-teal-300/25 dark:bg-teal-400/10 blur-3xl z-0"
-      />
-
-      {/* Subtle Concentric Orbital Rings Framing Centerpiece */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute top-8 left-1/2 -translate-x-1/2 w-[560px] sm:w-[760px] h-[560px] sm:h-[760px] rounded-full border border-emerald-600/10 dark:border-emerald-400/10 z-0"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute top-24 left-1/2 -translate-x-1/2 w-[380px] sm:w-[540px] h-[380px] sm:h-[540px] rounded-full border border-emerald-600/10 dark:border-emerald-400/10 z-0"
-      />
+    <BackgroundGraphics/>
 
       {/* Floating Modern Habit Cards & Micro-Accents */}
       <HeroFloatingElements />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-        {/* Eyebrow Tag */}
-        <div className="inline-flex items-center gap-2 mb-5 px-3.5 py-1.5 rounded-full bg-white/75 dark:bg-emerald-950/60 border border-emerald-200/70 dark:border-emerald-700/40 backdrop-blur-xs shadow-2xs">
-          <span className="w-2 h-2 rounded-full bg-[#2fe196]" />
-          <span className="text-[11px] sm:text-xs font-semibold tracking-[0.2em] text-[#183f2e] dark:text-[#2fe196] uppercase">
-            {SITE_CONFIG.heroTagline}
-          </span>
-        </div>
-
-        {/* Serif Headline */}
-        <h1 className="font-editorial text-4xl sm:text-6xl md:text-[68px] lg:text-[74px] font-normal tracking-tight text-[#123524] dark:text-white leading-[1.08] mb-6 max-w-4xl mx-auto text-balance">
-          Track Your Habits and Improve.
-          <br />
-          One Day at a Time.
-        </h1>
-
-        {/* Subheading */}
-        <p className="text-base sm:text-lg text-slate-600 dark:text-emerald-100/80 max-w-xl mx-auto leading-relaxed mb-9 font-normal">
-          {SITE_CONFIG.heroDescription}
-        </p>
+       <HeroTagLines/>
 
         {/* CTA Buttons */}
         <div className="relative inline-flex flex-col items-center">

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import SignedInHomeRedirect from '@/components/SignedInHomeRedirect';
-import { HeroSection } from '@/components/HeroSection';
+import { HeroSection } from '@/components/(hero_section)/HeroSection';
 import { ShowcaseSection } from '@/components/ShowcaseSection';
 import { FeaturesGridSection } from '@/components/FeaturesGridSection';
 import { HowItWorksSection } from '@/components/HowItWorksSection';

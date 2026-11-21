@@ -3,10 +3,10 @@ import { Habit, HabitCategory } from '../types/tracker';
 export const SITE_CONFIG = {
   name: 'Habitora',
   tagline: 'Better habits. A brighter you.',
-  heroTagline: 'SMALL STEPS. BIG CHANGES.',
+  // heroTagline: 'SMALL STEPS. BIG CHANGES.',
   heroTitle: 'Build Better Habits.\nOne Day at a Time.',
-  heroDescription:
-    'Habitora helps you track your daily habits, stay consistent and achieve your goals — with a simple, clean and flexible habit tracker.',
+  // heroDescription:
+  //   'Habitora helps you track your daily habits, stay consistent and achieve your goals — with a simple, clean and flexible habit tracker.',
   heroHandwrittenNote: 'Less stress,\nMore progress.',
   
   featuresKicker: 'MORE THAN JUST A TRACKER',
