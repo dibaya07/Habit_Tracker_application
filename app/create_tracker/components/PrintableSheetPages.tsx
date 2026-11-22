@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { Check } from 'lucide-react';
 import { DayLabelMode, Habit } from '@/lib/types/tracker';
 import {
@@ -12,13 +12,14 @@ import {
 } from '@/lib/utils/date';
 import BrandMark from '@/components/ui/BrandMark';
 import HabitProgressGraph from './HabitProgressGraph';
+import { SheetContext } from '../context/context';
 
 interface PrintableSheetPagesProps {
-  trackerName: string;
+  // trackerName: string;
   durationDays: number;
   startDate: string;
-  dayLabelMode: DayLabelMode;
-  includeGraph: boolean;
+  // dayLabelMode: DayLabelMode;
+  // includeGraph: boolean;
   selectedHabits: Habit[];
   checkedCells: Record<string, boolean>;
   plottedZeroDays: Record<number, boolean>;
@@ -31,15 +32,16 @@ interface PageChunk {
 }
 
 export default function PrintableSheetPages({
-  trackerName,
+  // trackerName,
   durationDays,
   startDate,
-  dayLabelMode,
-  includeGraph,
+  // dayLabelMode,
+  // includeGraph,
   selectedHabits,
   checkedCells,
   plottedZeroDays,
 }: PrintableSheetPagesProps) {
+    const sheetContext = useContext(SheetContext)
   const safeDuration = Math.max(1, Math.min(365, durationDays));
 
   // If durationDays <= 30 -> render everything on 1 single page.
@@ -74,7 +76,7 @@ export default function PrintableSheetPages({
   const formattedStartDate = formatUtcFullDate(baseDate);
 
   const getDayHeader = (dayNum: number) => {
-    if (dayLabelMode === 'numbers') {
+    if (sheetContext?.dayLabelMode === 'numbers') {
       return { top: '', bottom: String(dayNum) };
     }
     const d = addUtcDays(baseDate, dayNum - 1);
@@ -108,9 +110,9 @@ export default function PrintableSheetPages({
             {/* Sheet Header */}
             <div className="px-6 py-4 border-b border-slate-200 bg-[#fafcf9] flex flex-wrap items-center justify-between gap-4">
               <div className="min-w-0 space-y-1">
-                {trackerName.trim() ? (
+                {sheetContext?.trackerName.trim() ? (
                   <h1 className="font-editorial text-xl sm:text-2xl font-normal text-[#123524] break-words">
-                    {trackerName.trim()}
+                    {sheetContext.trackerName.trim()}
                   </h1>
                 ) : (
                   <div className="flex items-baseline gap-2.5 pt-1 pb-0.5">
@@ -227,7 +229,7 @@ export default function PrintableSheetPages({
             </div>
 
             {/* Optional Progress Graph (Light Paper) */}
-            {includeGraph && (
+            {sheetContext?.includeGraph && (
               <HabitProgressGraph
                 habits={selectedHabits}
                 visibleDayCount={page.dayNumbers.length}

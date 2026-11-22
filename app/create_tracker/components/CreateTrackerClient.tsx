@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Download, Eye, Loader2, LogIn, Save, TrendingUp } from "lucide-react";
@@ -21,6 +21,7 @@ import DesktopViewHabitList from "./(HabitList)/DesktopViewHabitList";
 import AddHabitBtn from "./(HabitList)/AddHabitBtn";
 import GraphMobileView from "./(HabitList)/GraphMobileView";
 import HabitProgressGraph from "./HabitProgressGraph";
+import { SheetContext } from "../context/context";
 
 const SheetPreviewModal = dynamic(() => import("./SheetPreviewModal"), {
   ssr: false,
@@ -37,30 +38,34 @@ export default function CreateTrackerClient({
   defaultHabits,
   // initialName = "",
   initialDuration = 30,
-  // headerIntro,
 }: CreateTrackerClientProps) {
   const router = useRouter();
   const { createTracker, user, openAuthModal, quickSignIn, hasMounted } =
     useHabitTracker();
 
+  //Context
+  const sheetContext = useContext(SheetContext)
+   if (!sheetContext){
+    throw new Error("something is wrong")
+  }
+  const {trackerName,customDaysInput,customStartDate, dayLabelMode,includeGraph} = sheetContext
+
   const isPresetDuration = initialDuration === 21 || initialDuration === 30;
   // const [trackerName, setTrackerName] = useState(initialName);
-  const [trackerName, setTrackerName] = useState("");
+  // const [trackerName, setTrackerName] = useState("");
   const [selectedDuration, setSelectedDuration] = useState<number>(
     isPresetDuration ? initialDuration : 30,
   );
   const [isCustomDuration, setIsCustomDuration] = useState(!isPresetDuration);
-  const [customDaysInput, setCustomDaysInput] = useState("30");
-  const [customStartDate, setCustomStartDate] = useState<string | null>(null);
-  const currentDate = new Date().toLocaleDateString("en-CA");
+  // const currentDate = new Date().toLocaleDateString("en-CA");
   // const startDate = customStartDate ?? currentDate;
 
   // (hasMounted ? getLocalTodayYmd() : DEFAULT_DATE_FALLBACK);
   const startDate =
     customStartDate ??
     (hasMounted ? getLocalTodayYmd() : DEFAULT_DATE_FALLBACK);
-  const [dayLabelMode, setDayLabelMode] = useState<DayLabelMode>("numbers");
-  const [includeGraph, setIncludeGraph] = useState(true);
+  // const [dayLabelMode, setDayLabelMode] = useState<DayLabelMode>("numbers");
+  // const [includeGraph, setIncludeGraph] = useState(true);
   const [selectedHabits, setSelectedHabits] = useState<Habit[]>(defaultHabits);
   const [newHabitName, setNewHabitName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -143,7 +148,7 @@ export default function CreateTrackerClient({
 
   const performSave = async () => {
     setIsSubmitting(true);
-    const resolvedSaveName = trackerName.trim() || "Habit Sheet";
+    const resolvedSaveName = sheetContext?.trackerName.trim() || "Habit Sheet";
     try {
       await fetch("/api/tracker", {
         method: "POST",
@@ -166,8 +171,8 @@ export default function CreateTrackerClient({
       effectiveDays,
       startDate,
       selectedHabits,
-      dayLabelMode,
-      includeGraph,
+      sheetContext.dayLabelMode,
+      sheetContext.includeGraph,
     );
     setIsSubmitting(false);
     router.push("/dashboard");
@@ -202,18 +207,18 @@ export default function CreateTrackerClient({
             <div className="no-print flex flex-col lg:flex-row gap-5 sm:gap-6 items-stretch lg:items-end">
               <SheetNameInputArea
                 isSubmitting={isSubmitting}
-                trackerName={trackerName}
-                setTrackerName={setTrackerName}
+                // trackerName={sheetContext?.trackerName}
+                // setTrackerName={sheetContext?.setTrackerName}
                 startDate={startDate}
-                setCustomStartDate={setCustomStartDate}
+                // setCustomStartDate={setCustomStartDate}
               />
               <div className="w-full lg:flex-[4] min-w-0">
                 <TimePeriod
                   selectedDuration={selectedDuration}
                   isCustomDuration={isCustomDuration}
                   setIsCustomDuration={setIsCustomDuration}
-                  customDaysInput={customDaysInput}
-                  setCustomDaysInput={setCustomDaysInput}
+                  // customDaysInput={customDaysInput}
+                  // setCustomDaysInput={setCustomDaysInput}
                   setSelectedDuration={setSelectedDuration}
                 />
               </div>
@@ -228,9 +233,9 @@ export default function CreateTrackerClient({
                   className="no-print rounded-2xl border border-[#dce8df] dark:border-emerald-900/50 bg-white dark:bg-[#081d15] shadow-xs overflow-hidden"
                 >
                   <SheetHeader
-                    trackerName={trackerName}
-                    dayLabelMode={dayLabelMode}
-                    setDayLabelMode={setDayLabelMode}
+                    // trackerName={sheetContext?.trackerName}
+                    // dayLabelMode={dayLabelMode}
+                    // setDayLabelMode={setDayLabelMode}
                     startDate={startDate}
                   />
                   <HabitListMobileView
@@ -248,7 +253,7 @@ export default function CreateTrackerClient({
                     checkedCells={checkedCells}
                     setCheckedCells={setCheckedCells}
                     setPlottedZeroDays={setPlottedZeroDays}
-                    dayLabelMode={dayLabelMode}
+                    // dayLabelMode={dayLabelMode}
                     startDate={startDate}
                   />
                   <AddHabitBtn
@@ -257,50 +262,36 @@ export default function CreateTrackerClient({
                     handleAddCustomHabit={handleAddCustomHabit}
                     selectedHabits={selectedHabits}
                     handleSelectSuggestedHabit={handleSelectSuggestedHabit}
-                    includeGraph={includeGraph}
-                    setIncludeGraph={setIncludeGraph}
+                    // includeGraph={includeGraph}
+                    // setIncludeGraph={setIncludeGraph}
                   />
                   <GraphMobileView
-                    includeGraph={includeGraph}
-                    setIncludeGraph={setIncludeGraph}
+                    // includeGraph={includeGraph}
+                    // setIncludeGraph={setIncludeGraph}
                     onOpenPreview={(mode) => setPreviewMode(mode)}
                   />
-                  {includeGraph && (
+                  {sheetContext.includeGraph && (
                     <div className="hidden md:block">
                       <HabitProgressGraph
                         habits={selectedHabits}
                         durationDays={effectiveDays}
                         startDate={startDate}
-                        dayLabelMode={dayLabelMode}
+                        // dayLabelMode={sheetContext.dayLabelMode}
                         checkedCells={checkedCells}
                         plottedZeroDays={plottedZeroDays}
-                        onRemoveGraph={() => setIncludeGraph(false)}
+                        onRemoveGraph={() => sheetContext.setIncludeGraph(false)}
                         setCheckedCells={setCheckedCells}
                         setPlottedZeroDays={setPlottedZeroDays}
                       />
                     </div>
                   )}
                   <HabitList
-                    trackerName={trackerName}
                     durationDays={effectiveDays}
-                    startDate={startDate}
-                    dayLabelMode={dayLabelMode}
-                    setDayLabelMode={setDayLabelMode}
-                    includeGraph={includeGraph}
-                    setIncludeGraph={setIncludeGraph}
                     selectedHabits={selectedHabits}
-                    handleRemoveHabit={handleRemoveHabit}
-                    handleAddCustomHabit={handleAddCustomHabit}
-                    newHabitName={newHabitName}
-                    setNewHabitName={setNewHabitName}
-                    handleSelectSuggestedHabit={handleSelectSuggestedHabit}
                     checkedCells={checkedCells}
                     setCheckedCells={setCheckedCells}
                     plottedZeroDays={plottedZeroDays}
                     setPlottedZeroDays={setPlottedZeroDays}
-                    onOpenPreview={(mode) => setPreviewMode(mode)}
-                    confirmDeleteHabitId={confirmDeleteHabitId}
-                    setConfirmDeleteHabitId={setConfirmDeleteHabitId}
                   />
                 </div>
               </div>
@@ -344,11 +335,11 @@ export default function CreateTrackerClient({
       {!previewMode && (
         <div className="hidden print:block">
           <PrintableSheetPages
-            trackerName={trackerName}
+            // trackerName={trackerName}
             durationDays={effectiveDays}
             startDate={startDate}
-            dayLabelMode={dayLabelMode}
-            includeGraph={includeGraph}
+            // dayLabelMode={dayLabelMode}
+            // includeGraph={includeGraph}
             selectedHabits={selectedHabits}
             checkedCells={checkedCells}
             plottedZeroDays={plottedZeroDays}

@@ -1,22 +1,28 @@
 "use client"
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import TimePeriod from "./TimePeriod";
+import { SheetContext } from "../context/context";
 
 interface SheetNameInputAreaProp {
   isSubmitting: boolean;
-  trackerName: string;
-  setTrackerName: (value: string) => void;
+  // trackerName: string;
+  // setTrackerName: (value: string) => void;
   startDate: string;
-  setCustomStartDate: (value: string | null) => void;
+  // setCustomStartDate: (value: string | null) => void;
 }
 
 export default function SheetNameInputArea({
   isSubmitting,
-  trackerName,
-  setTrackerName,
+  // trackerName,
+  // setTrackerName,
   startDate,
-  setCustomStartDate,
+  // setCustomStartDate,
 }: SheetNameInputAreaProp) {
+  const sheetContext = useContext(SheetContext)
+  // if (!context){
+  //   throw new Error("something is wrong")
+  // }
+  // const {trackerName,setTrackerName} = context
   return (
     <>
       <div className="w-full lg:flex-[5] min-w-0">
@@ -30,8 +36,8 @@ export default function SheetNameInputArea({
           id="trackerName"
           type="text"
           disabled={isSubmitting}
-          value={trackerName}
-          onChange={(e) => setTrackerName(e.target.value)}
+          value={sheetContext?.trackerName}
+          onChange={(e) => sheetContext?.setTrackerName(e.target.value)}
           placeholder="Leave blank for manual title or type sheet name..."
           className="w-full px-1 py-2 bg-transparent border-0 border-b-2 border-slate-300 dark:border-emerald-800/70 rounded-none text-slate-900 dark:text-white text-base font-medium placeholder:text-slate-400 dark:placeholder:text-emerald-300/40 focus:outline-none focus:border-[#183f2e] dark:focus:border-[#2fe196] disabled:opacity-60 transition-colors"
         />
@@ -49,7 +55,7 @@ export default function SheetNameInputArea({
           type="date" 
           disabled={isSubmitting}
           value={startDate}
-          onChange={(e) => setCustomStartDate(e.target.value)}
+          onChange={(e) => sheetContext?.setCustomStartDate(e.target.value)}
           className="block w-full min-h-[42px] px-3 py-2 rounded-xl bg-[#fafcf9] dark:bg-emerald-950/60 border border-[#dce8df] dark:border-emerald-900/50 text-slate-900 dark:text-white text-sm font-mono tabular-nums focus:outline-none focus:border-[#183f2e] dark:focus:border-[#2fe196] disabled:opacity-60 transition-colors"
         />
       </div>

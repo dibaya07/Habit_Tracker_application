@@ -8,13 +8,14 @@ import {
   parseUtcDate,
 } from "@/lib/utils/date";
 import { Check, Trash2 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
+import { SheetContext } from "../../context/context";
 
 interface DesktopViewHabitListProps {
   //   trackerName: string;
   durationDays: number;
   startDate: string;
-  dayLabelMode: DayLabelMode;
+  // dayLabelMode: DayLabelMode;
   //   setDayLabelMode: (mode: DayLabelMode) => void;
   //   includeGraph: boolean;
   //   setIncludeGraph: (value: boolean) => void;
@@ -46,9 +47,11 @@ export default function DesktopViewHabitList({
   checkedCells: externalCheckedCells,
   setCheckedCells: externalSetCheckedCells,
   setPlottedZeroDays: externalSetPlottedZeroDays,
-  dayLabelMode,
+  // dayLabelMode,
   startDate,
 }: DesktopViewHabitListProps) {
+
+     const sheetContext = useContext(SheetContext)
   const visibleDayCount = Math.min(10, Math.max(1, durationDays));
   const extraDaysCount = Math.max(0, durationDays - visibleDayCount);
 
@@ -70,7 +73,7 @@ export default function DesktopViewHabitList({
   // const formattedStartDate = formatUtcFullDate(baseDate);
 
   const getDayHeader = (dayNum: number) => {
-    if (dayLabelMode === "numbers") {
+    if (sheetContext?.dayLabelMode === "numbers") {
       return {
         top: "",
         bottom: String(dayNum),

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Check, Eye, Plus, Trash2, TrendingUp } from "lucide-react";
 import { DayLabelMode, Habit, HabitCategory } from "@/lib/types/tracker";
 import {
@@ -16,21 +16,22 @@ import DayLabelDropdown from "@/components/tracker/DayLabelDropdown";
 import CustomHabitForm from "../CustomHabitForm";
 import QuickSuggestions from "../QuickSuggestions";
 import HabitProgressGraph from "../HabitProgressGraph";
+import { SheetContext } from "../../context/context";
 
 interface HabitListProp {
-  trackerName: string;
+  // trackerName: string;
   durationDays: number;
-  startDate: string;
-  dayLabelMode: DayLabelMode;
-  setDayLabelMode: (mode: DayLabelMode) => void;
-  includeGraph: boolean;
-  setIncludeGraph: (value: boolean) => void;
+  // startDate: string;
+  // dayLabelMode: DayLabelMode;
+  // setDayLabelMode: (mode: DayLabelMode) => void;
+  // includeGraph: boolean;
+  // setIncludeGraph: (value: boolean) => void;
   selectedHabits: Habit[];
-  handleRemoveHabit: (id: string) => void;
-  handleAddCustomHabit: (e: React.FormEvent) => void;
-  newHabitName: string;
-  setNewHabitName: (name: string) => void;
-  handleSelectSuggestedHabit: (name: string, category: HabitCategory) => void;
+  // handleRemoveHabit: (id: string) => void;
+  // handleAddCustomHabit: (e: React.FormEvent) => void;
+  // newHabitName: string;
+  // setNewHabitName: (name: string) => void;
+  // handleSelectSuggestedHabit: (name: string, category: HabitCategory) => void;
   checkedCells?: Record<string, boolean>;
   setCheckedCells?: React.Dispatch<
     React.SetStateAction<Record<string, boolean>>
@@ -39,33 +40,35 @@ interface HabitListProp {
   setPlottedZeroDays?: React.Dispatch<
     React.SetStateAction<Record<number, boolean>>
   >;
-  onOpenPreview?: (mode: "sheet" | "graph") => void;
-  confirmDeleteHabitId: string | null;
-  setConfirmDeleteHabitId: (value: null | string) => void;
+  // onOpenPreview?: (mode: "sheet" | "graph") => void;
+  // confirmDeleteHabitId: string | null;
+  // setConfirmDeleteHabitId: (value: null | string) => void;
 }
 
 export default function HabitList({
-  trackerName,
+  // trackerName,
   durationDays,
-  startDate,
-  dayLabelMode,
-  setDayLabelMode,
-  includeGraph,
-  setIncludeGraph,
+  // startDate,
+  // dayLabelMode,
+  // setDayLabelMode,
+  // includeGraph,
+  // setIncludeGraph,
   selectedHabits,
-  handleRemoveHabit,
-  handleAddCustomHabit,
-  newHabitName,
-  setNewHabitName,
-  handleSelectSuggestedHabit,
+  // handleRemoveHabit,
+  // handleAddCustomHabit,
+  // newHabitName,
+  // setNewHabitName,
+  // handleSelectSuggestedHabit,
   checkedCells: externalCheckedCells,
   setCheckedCells: externalSetCheckedCells,
   plottedZeroDays: externalPlottedZeroDays,
   setPlottedZeroDays: externalSetPlottedZeroDays,
-  onOpenPreview,
-  confirmDeleteHabitId,
-  setConfirmDeleteHabitId,
+  // onOpenPreview,
+  // confirmDeleteHabitId,
+  // setConfirmDeleteHabitId,
 }: HabitListProp) {
+
+     const sheetContext = useContext(SheetContext)
   // const [isAddingHabit, setIsAddingHabit] = useState(false);
   // const [confirmDeleteHabitId, setConfirmDeleteHabitId] = useState<string | null>(null);
   const [internalCheckedCells, setInternalCheckedCells] = useState<

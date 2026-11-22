@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { SITE_CONFIG } from "@/lib/data/site-config";
 import { getTemplateBySlug } from "@/lib/data/templates";
 import CreateTrackerClient from "./components/CreateTrackerClient";
+import { SheetContextProvider } from "./context/context";
 
 const CREATE_TITLE = "Create Habit Tracker Sheet";
 const CREATE_DESCRIPTION =
@@ -33,13 +34,14 @@ export default async function CreateTrackerPage({searchParams,}: {searchParams: 
   const matchedTemplate = getTemplateBySlug(templateSlug);
 
   return (
-    <CreateTrackerClient
+   <SheetContextProvider>
+     <CreateTrackerClient
       defaultHabits={
         matchedTemplate ? matchedTemplate.habits : SITE_CONFIG.defaultHabits
       }
       // initialName={matchedTemplate ? matchedTemplate.title : ""}
       initialDuration={matchedTemplate ? matchedTemplate.durationDays : 30}
-      // headerIntro={headerIntro}
     />
+   </SheetContextProvider>
   );
 }

@@ -1,14 +1,15 @@
 'use client';
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { Calendar } from 'lucide-react';
+import { SheetContext } from '../context/context';
 
 interface TimePeriodProp {
   selectedDuration: number;
   isCustomDuration: boolean;
   setIsCustomDuration: (value: boolean) => void;
-  customDaysInput: string;
-  setCustomDaysInput: (value: string) => void;
+  // customDaysInput: string;
+  // setCustomDaysInput: (value: string) => void;
   setSelectedDuration: (value: number) => void;
 }
 
@@ -21,10 +22,11 @@ export default function TimePeriod({
   selectedDuration,
   isCustomDuration,
   setIsCustomDuration,
-  customDaysInput,
-  setCustomDaysInput,
+  // customDaysInput,
+  // setCustomDaysInput,
   setSelectedDuration,
 }: TimePeriodProp) {
+  const sheetContext = useContext(SheetContext)
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-2">
@@ -68,8 +70,8 @@ export default function TimePeriod({
               type="number"
               min={1}
               max={365}
-              value={customDaysInput}
-              onChange={(e) => setCustomDaysInput(e.target.value)}
+              value={sheetContext?.customDaysInput}
+              onChange={(e) => sheetContext?.setCustomDaysInput(e.target.value)}
               aria-label="Custom number of days"
               autoFocus
               className="w-12 bg-transparent border-b border-white/60 dark:border-[#071912]/60 text-center text-xs font-mono font-bold tabular-nums focus:outline-none"
