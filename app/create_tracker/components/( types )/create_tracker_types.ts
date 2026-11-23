@@ -20,6 +20,6 @@ export interface contextType {
   setSelectedDuration: React.Dispatch<React.SetStateAction<number>>;
   isSubmitting: boolean;
   setIsSubmitting: React.Dispatch<React.SetStateAction<boolean>>;
-  confirmDeleteHabitId: string | null;
+  confirmDeleteHabitId: string | null | undefined;
   setConfirmDeleteHabitId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
 }

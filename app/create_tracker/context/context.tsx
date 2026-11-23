@@ -38,7 +38,7 @@ export const SheetContextProvider = ({
   const extraDaysCount = Math.max(0, effectiveDays - visibleDayCount);
 
   const [confirmDeleteHabitId, setConfirmDeleteHabitId] = useState<
-    string | null
+    string | null | undefined
   >(null);
 
   
