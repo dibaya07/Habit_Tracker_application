@@ -21,5 +21,5 @@ export interface contextType {
   isSubmitting: boolean;
   setIsSubmitting: React.Dispatch<React.SetStateAction<boolean>>;
   confirmDeleteHabitId: string | null;
-  setConfirmDeleteHabitId: React.Dispatch<React.SetStateAction<string | null>>;
+  setConfirmDeleteHabitId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
 }

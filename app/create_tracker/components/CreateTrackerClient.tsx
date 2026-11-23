@@ -66,8 +66,8 @@ export default function CreateTrackerClient({
   const [plottedZeroDays, setPlottedZeroDays] = useState<
     Record<number, boolean>
   >({});
-  
-  const handleRemoveHabit = (id: string) => {
+
+  const handleRemoveHabit = (id: string | undefined) => {
     if (selectedHabits.length <= 1) return;
     setSelectedHabits((prev) => prev.filter((h) => h.id !== id));
   };

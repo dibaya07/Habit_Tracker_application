@@ -12,10 +12,9 @@ import React, { useContext, useState } from "react";
 import { SheetContext, useSheetContext } from "../../context/context";
 
 interface DesktopViewHabitListProps {
-  // durationDays: number;
   startDate: string;
   selectedHabits: Habit[];
-  handleRemoveHabit: (id: string) => void;
+  handleRemoveHabit: (id: string | undefined) => void;
   checkedCells?: Record<string, boolean>;
   setCheckedCells?: React.Dispatch<
     React.SetStateAction<Record<string, boolean>>
@@ -23,8 +22,6 @@ interface DesktopViewHabitListProps {
   setPlottedZeroDays?: React.Dispatch<
     React.SetStateAction<Record<number, boolean>>
   >;
-  // confirmDeleteHabitId: string | null;
-  // setConfirmDeleteHabitId: (value: null | string) => void;
 }
 
 export default function DesktopViewHabitList({
@@ -35,7 +32,13 @@ export default function DesktopViewHabitList({
   setPlottedZeroDays: externalSetPlottedZeroDays,
   startDate,
 }: DesktopViewHabitListProps) {
-  const { trackerName, setTrackerName,customDaysInput, setCustomDaysInput, customStartDate, setCustomStartDate,dayLabelMode, setDayLabelMode, includeGraph, setIncludeGraph,visibleDayCount,extraDaysCount, effectiveDays,isCustomDuration, setIsCustomDuration, selectedDuration, setSelectedDuration, isSubmitting, setIsSubmitting,confirmDeleteHabitId, setConfirmDeleteHabitId} = useSheetContext();
+  const {
+    dayLabelMode,
+    visibleDayCount,
+    extraDaysCount,
+    confirmDeleteHabitId,
+    setConfirmDeleteHabitId,
+  } = useSheetContext();
 
   const daysArray = Array.from({ length: visibleDayCount }, (_, i) => i + 1);
 
@@ -68,7 +71,7 @@ export default function DesktopViewHabitList({
     };
   };
 
-  const toggleCell = (habitId: string, dayNum: number) => {
+  const toggleCell = (habitId: string | undefined, dayNum: number) => {
     const key = `${habitId}-${dayNum}`;
     setCheckedCells((prev) => ({ ...prev, [key]: !prev[key] }));
     setPlottedZeroDays((prev) => {
