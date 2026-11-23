@@ -5,11 +5,11 @@ export type TrackingStatus = 'completed' | 'failed' | 'empty';
 export type DayLabelMode = 'numbers' | 'dates';
 
 export interface Habit {
-  id: string;
+  id?: string;
   name: string;
-  category: HabitCategory;
-  color?: string;
-  targetPerWeek?: number;
+  // category?: HabitCategory;
+  // color?: string;
+  // targetPerWeek?: number;
   active: boolean;
 }
 

@@ -15,7 +15,7 @@ import IconTooltip from "@/components/ui/IconTooltip";
 import DayLabelDropdown from "@/components/tracker/DayLabelDropdown";
 import CustomHabitForm from "../CustomHabitForm";
 import QuickSuggestions from "../QuickSuggestions";
-import HabitProgressGraph from "../HabitProgressGraph";
+import HabitProgressGraph from "../( graph )/HabitProgressGraph";
 import { SheetContext } from "../../context/context";
 
 interface HabitListProp {

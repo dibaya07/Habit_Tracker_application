@@ -9,8 +9,9 @@ import { SheetContext } from "../../context/context";
 interface AddHabitBtnProps {
   newHabitName: string;
   setNewHabitName: (value: string) => void;
-  handleAddCustomHabit: (value: React.FormEvent) => void;
+  // handleAddCustomHabit: (value: React.FormEvent) => void;
   selectedHabits: Habit[];
+  setSelectedHabits:React.Dispatch<React.SetStateAction<Habit[]>>;
   handleSelectSuggestedHabit: (name: string, category: HabitCategory) => void;
   // includeGraph: boolean;
   // setIncludeGraph: (value: boolean) => void;
@@ -19,14 +20,27 @@ interface AddHabitBtnProps {
 export default function AddHabitBtn({
   newHabitName,
   setNewHabitName,
-  handleAddCustomHabit,
+  // handleAddCustomHabit,
   selectedHabits,
+  setSelectedHabits,
   handleSelectSuggestedHabit,
   // includeGraph,
   // setIncludeGraph,
 }: AddHabitBtnProps) {
   const sheetContext = useContext(SheetContext);
   const [isAddingHabit, setIsAddingHabit] = useState(false);
+
+   const handleAddCustomHabit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newHabitName.trim()) return;
+    const newHabit: Habit = {
+      name: newHabitName.trim(),
+      active: true,
+    };
+
+    setSelectedHabits((prev) => [...prev, newHabit]);
+    setNewHabitName("");
+  };
 
   const handleFormSubmit = (e: React.FormEvent) => {
     handleAddCustomHabit(e);

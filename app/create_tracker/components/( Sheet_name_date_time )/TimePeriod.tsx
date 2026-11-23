@@ -2,7 +2,7 @@
 
 import React, { useContext } from "react";
 import { Calendar } from "lucide-react";
-import { SheetContext, useSheetContext } from "../context/context";
+import {  useSheetContext } from "../../context/context";
 
 const DURATION_OPTIONS = [
   { days: 21, label: "21 Days" },

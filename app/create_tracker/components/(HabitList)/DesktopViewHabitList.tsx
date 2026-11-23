@@ -35,7 +35,7 @@ export default function DesktopViewHabitList({
   setPlottedZeroDays: externalSetPlottedZeroDays,
   startDate,
 }: DesktopViewHabitListProps) {
-  const {initialValue, trackerName, setTrackerName,customDaysInput, setCustomDaysInput, customStartDate, setCustomStartDate,dayLabelMode, setDayLabelMode, includeGraph, setIncludeGraph,visibleDayCount,extraDaysCount, effectiveDays,isCustomDuration, setIsCustomDuration, selectedDuration, setSelectedDuration, isSubmitting, setIsSubmitting,confirmDeleteHabitId, setConfirmDeleteHabitId} = useSheetContext();
+  const { trackerName, setTrackerName,customDaysInput, setCustomDaysInput, customStartDate, setCustomStartDate,dayLabelMode, setDayLabelMode, includeGraph, setIncludeGraph,visibleDayCount,extraDaysCount, effectiveDays,isCustomDuration, setIsCustomDuration, selectedDuration, setSelectedDuration, isSubmitting, setIsSubmitting,confirmDeleteHabitId, setConfirmDeleteHabitId} = useSheetContext();
 
   const daysArray = Array.from({ length: visibleDayCount }, (_, i) => i + 1);
 

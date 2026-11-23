@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { ArrowRight, Check, Plus, Calendar, Settings, Search } from 'lucide-react';
-
+ 
 export const ShowcaseSection: React.FC = () => {
   return (
     <section className="py-10 md:py-16 overflow-hidden">

@@ -6,62 +6,55 @@ import { useHabitTracker } from "@/lib/context/HabitTrackerContext";
 import { Habit, HabitCategory } from "@/lib/types/tracker";
 import { DEFAULT_DATE_FALLBACK, getLocalTodayYmd } from "@/lib/utils/date";
 import dynamic from "next/dynamic";
-import TimePeriod from "./TimePeriod";
-import HabitList from "./(HabitList)/HabitList";
-import PrintableSheetPages from "./PrintableSheetPages";
-import HeaderIntro from "./HeaderIntro";
-import SheetNameInputArea from "./SheetNameInputArea";
-import FooterActions from "./FooterActions";
-import SheetHeader from "./(HabitList)/SheetHeader";
+import TimePeriod from "./( Sheet_name_date_time )/TimePeriod";
+import HabitList from "./( sheetFooter_addBtn )/sheetFooter";
+import PrintableSheetPages from "./( preview )/PrintableSheetPages";
+import HeaderIntro from "./( create_tracker_header )/HeaderIntro";
+import SheetNameInputArea from "./( Sheet_name_date_time )/SheetNameInputArea";
+import FooterActions from "./( save_download_btn )/FooterActions";
+import SheetHeader from "./( sheet_header )/SheetHeader";
 import HabitListMobileView from "./(HabitList)/HabitListMobileView";
 import DesktopViewHabitList from "./(HabitList)/DesktopViewHabitList";
-import AddHabitBtn from "./(HabitList)/AddHabitBtn";
-import GraphMobileView from "./(HabitList)/GraphMobileView";
-import HabitProgressGraph from "./HabitProgressGraph";
+import AddHabitBtn from "./( sheetFooter_addBtn )/AddHabitBtn";
+import GraphMobileView from "./( graph )/GraphMobileView";
+import HabitProgressGraph from "./( graph )/HabitProgressGraph";
 import { useSheetContext } from "../context/context";
 
-const SheetPreviewModal = dynamic(() => import("./SheetPreviewModal"), {
-  ssr: false,
-});
+const SheetPreviewModal = dynamic(
+  () => import("./( preview )/SheetPreviewModal"),
+  {
+    ssr: false,
+  },
+);
 
 interface CreateTrackerClientProps {
   defaultHabits: Habit[];
   initialName?: string;
   initialDuration?: number;
-  // headerIntro: React.ReactNode;
 }
 
 export default function CreateTrackerClient({
   defaultHabits,
   // initialName = "",
-  initialDuration = 30,
+  // initialDuration = 30,
 }: CreateTrackerClientProps) {
   const router = useRouter();
   const { createTracker, user, openAuthModal, quickSignIn, hasMounted } =
     useHabitTracker();
   const {
     trackerName,
-    customDaysInput,
     customStartDate,
     dayLabelMode,
     includeGraph,
     setIncludeGraph,
     effectiveDays,
-    selectedDuration,
-    isCustomDuration,
-    setIsCustomDuration,
-    setSelectedDuration,
     isSubmitting,
     setIsSubmitting,
-    confirmDeleteHabitId,
-    setConfirmDeleteHabitId,
   } = useSheetContext();
 
   const startDate =
     customStartDate ??
     (hasMounted ? getLocalTodayYmd() : DEFAULT_DATE_FALLBACK);
-  // const [dayLabelMode, setDayLabelMode] = useState<DayLabelMode>("numbers");
-  // const [includeGraph, setIncludeGraph] = useState(true);
   const [selectedHabits, setSelectedHabits] = useState<Habit[]>(defaultHabits);
   const [newHabitName, setNewHabitName] = useState("");
   const [showSignInPrompt, setShowSignInPrompt] = useState(false);
@@ -73,62 +66,19 @@ export default function CreateTrackerClient({
   const [plottedZeroDays, setPlottedZeroDays] = useState<
     Record<number, boolean>
   >({});
-
-  // const effectiveDays = isCustomDuration
-  //   ? Math.max(1, Math.min(365, parseInt(customDaysInput, 10) || 30))
-  //   : selectedDuration;
-
-  const handleAddCustomHabit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newHabitName.trim()) return;
-
-    const colors = [
-      "#2fe196",
-      "#38bdf8",
-      "#a78bfa",
-      "#fbbf24",
-      "#f43f5e",
-      "#34d399",
-    ];
-    const newHabit: Habit = {
-      id: `custom_${newHabitName.trim().toLowerCase().replace(/\s+/g, "_")}_${Date.now()}`,
-      name: newHabitName.trim(),
-      category: "Lifestyle",
-      color: colors[selectedHabits.length % colors.length],
-      active: true,
-      targetPerWeek: 7,
-    };
-
-    setSelectedHabits((prev) => [...prev, newHabit]);
-    setNewHabitName("");
-  };
-
+  
   const handleRemoveHabit = (id: string) => {
     if (selectedHabits.length <= 1) return;
     setSelectedHabits((prev) => prev.filter((h) => h.id !== id));
   };
 
-  const handleSelectSuggestedHabit = (
-    name: string,
-    category: HabitCategory,
-  ) => {
+  const handleSelectSuggestedHabit = (name: string) => {
     if (selectedHabits.some((h) => h.name.toLowerCase() === name.toLowerCase()))
       return;
-    const colors = [
-      "#2fe196",
-      "#38bdf8",
-      "#a78bfa",
-      "#fbbf24",
-      "#f43f5e",
-      "#34d399",
-    ];
     const newHabit: Habit = {
       id: `sugg_${name.toLowerCase().replace(/\s+/g, "_")}_${Date.now()}`,
       name,
-      category,
-      color: colors[selectedHabits.length % colors.length],
       active: true,
-      targetPerWeek: 7,
     };
     setSelectedHabits((prev) => [...prev, newHabit]);
   };
@@ -228,8 +178,9 @@ export default function CreateTrackerClient({
                   <AddHabitBtn
                     newHabitName={newHabitName}
                     setNewHabitName={setNewHabitName}
-                    handleAddCustomHabit={handleAddCustomHabit}
+                    // handleAddCustomHabit={handleAddCustomHabit}
                     selectedHabits={selectedHabits}
+                    setSelectedHabits={setSelectedHabits}
                     handleSelectSuggestedHabit={handleSelectSuggestedHabit}
                   />
                   <GraphMobileView

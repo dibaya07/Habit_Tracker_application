@@ -5,6 +5,7 @@ import { SITE_CONFIG } from "@/lib/data/site-config";
 import { getTemplateBySlug } from "@/lib/data/templates";
 import CreateTrackerClient from "./components/CreateTrackerClient";
 import { SheetContextProvider } from "./context/context";
+import { Habit } from "@/lib/types/tracker";
 
 const CREATE_TITLE = "Create Habit Tracker Sheet";
 const CREATE_DESCRIPTION =
@@ -29,18 +30,27 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function CreateTrackerPage({searchParams,}: {searchParams: Promise<{ template?: string }>;}) {
-  const { template: templateSlug } = await searchParams;
-  const matchedTemplate = getTemplateBySlug(templateSlug);
+const defaultHabits : Habit[] = [
+    { id: 'h1', name: 'Exercise', active: true, },
+    { id: 'h2', name: 'Meditation', active: true, },
+    { id: 'h3', name: 'Read a book', active: true, },
+    { id: 'h4', name: 'Drink water', active: true, },
+    { id: 'h5', name: 'Healthy food', active: true, },
+  ];
+
+export default async function CreateTrackerPage() {
+// export default async function CreateTrackerPage({searchParams,}: {searchParams: Promise<{ template?: string }>;}) {
+//   const { template: templateSlug } = await searchParams;
+//   const matchedTemplate = getTemplateBySlug(templateSlug);
 
   return (
    <SheetContextProvider>
      <CreateTrackerClient
-      defaultHabits={
-        matchedTemplate ? matchedTemplate.habits : SITE_CONFIG.defaultHabits
-      }
+      defaultHabits={defaultHabits}
+      //   matchedTemplate ? matchedTemplate.habits : SITE_CONFIG.defaultHabits
+      // }
       // initialName={matchedTemplate ? matchedTemplate.title : ""}
-      initialDuration={matchedTemplate ? matchedTemplate.durationDays : 30}
+      // initialDuration={matchedTemplate ? matchedTemplate.durationDays : 30}
     />
    </SheetContextProvider>
   );

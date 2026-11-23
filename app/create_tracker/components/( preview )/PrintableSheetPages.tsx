@@ -1,25 +1,21 @@
-'use client';
+"use client";
 
-import React, { useContext, useMemo } from 'react';
-import { Check } from 'lucide-react';
-import { DayLabelMode, Habit } from '@/lib/types/tracker';
+import React, { useContext, useMemo } from "react";
+import { Check } from "lucide-react";
+import { DayLabelMode, Habit } from "@/lib/types/tracker";
 import {
   addUtcDays,
   formatUtcFullDate,
   getUtcDayNumber,
   getUtcWeekdayNarrow,
   parseUtcDate,
-} from '@/lib/utils/date';
-import BrandMark from '@/components/ui/BrandMark';
-import HabitProgressGraph from './HabitProgressGraph';
-import { SheetContext, useSheetContext } from '../context/context';
+} from "@/lib/utils/date";
+import BrandMark from "@/components/ui/BrandMark";
+import HabitProgressGraph from "../( graph )/HabitProgressGraph";
+import { SheetContext, useSheetContext } from "../../context/context";
 
 interface PrintableSheetPagesProps {
-  // trackerName: string;
-  // durationDays: number;
   startDate: string;
-  // dayLabelMode: DayLabelMode;
-  // includeGraph: boolean;
   selectedHabits: Habit[];
   checkedCells: Record<string, boolean>;
   plottedZeroDays: Record<number, boolean>;
@@ -32,31 +28,15 @@ interface PageChunk {
 }
 
 export default function PrintableSheetPages({
-  // trackerName,
-  // durationDays,
   startDate,
-  // dayLabelMode,
-  // includeGraph,
   selectedHabits,
   checkedCells,
   plottedZeroDays,
 }: PrintableSheetPagesProps) {
-   const {
-      trackerName,
-      customDaysInput,
-      customStartDate,
-      dayLabelMode,
-      includeGraph,
-      setIncludeGraph,
-      visibleDayCount,
-      effectiveDays
-  
-    } = useSheetContext();
-    // const sheetContext = useContext(SheetContext)
+  const { trackerName, dayLabelMode, includeGraph, effectiveDays } =
+    useSheetContext();
   const safeDuration = Math.max(1, Math.min(365, effectiveDays));
 
-  // If durationDays <= 30 -> render everything on 1 single page.
-  // If durationDays > 30 -> split cleanly across 2 pages.
   const pages: PageChunk[] = useMemo(() => {
     if (safeDuration <= 30) {
       return [
@@ -78,7 +58,10 @@ export default function PrintableSheetPages({
       {
         pageNumber: 2,
         totalPages: 2,
-        dayNumbers: Array.from({ length: safeDuration - splitDay }, (_, i) => splitDay + i + 1),
+        dayNumbers: Array.from(
+          { length: safeDuration - splitDay },
+          (_, i) => splitDay + i + 1,
+        ),
       },
     ];
   }, [safeDuration]);
@@ -87,8 +70,8 @@ export default function PrintableSheetPages({
   const formattedStartDate = formatUtcFullDate(baseDate);
 
   const getDayHeader = (dayNum: number) => {
-    if (dayLabelMode === 'numbers') {
-      return { top: '', bottom: String(dayNum) };
+    if (dayLabelMode === "numbers") {
+      return { top: "", bottom: String(dayNum) };
     }
     const d = addUtcDays(baseDate, dayNum - 1);
     return {
@@ -102,11 +85,11 @@ export default function PrintableSheetPages({
       {pages.map((page) => {
         const isCompact = page.dayNumbers.length > 15;
         const leftColClass = isCompact
-          ? 'w-[170px] sm:w-[190px]'
-          : 'w-[220px] sm:w-[260px]';
+          ? "w-[170px] sm:w-[190px]"
+          : "w-[220px] sm:w-[260px]";
         const dayColMinWidthPx = isCompact ? 22 : 34;
-        const circleSizeClass = isCompact ? 'w-4 h-4' : 'w-6 h-6';
-        const iconSizeClass = isCompact ? 'w-2.5 h-2.5' : 'w-3.5 h-3.5';
+        const circleSizeClass = isCompact ? "w-4 h-4" : "w-6 h-6";
+        const iconSizeClass = isCompact ? "w-2.5 h-2.5" : "w-3.5 h-3.5";
         const startDay = page.dayNumbers[0];
         const endDay = page.dayNumbers[page.dayNumbers.length - 1];
         const hasNextPage = page.pageNumber < page.totalPages;
@@ -115,7 +98,7 @@ export default function PrintableSheetPages({
           <div
             key={page.pageNumber}
             className={`print-container w-full rounded-2xl border border-slate-300 bg-white text-slate-900 shadow-2xl overflow-hidden print:rounded-none print:border-slate-300 print:shadow-none ${
-              hasNextPage ? 'print-page-break' : ''
+              hasNextPage ? "print-page-break" : ""
             }`}
           >
             {/* Sheet Header */}
@@ -134,8 +117,8 @@ export default function PrintableSheetPages({
                   </div>
                 )}
                 <p className="text-xs text-slate-600 font-mono tabular-nums">
-                  Start: {formattedStartDate} · Days {startDay}–{endDay} of {safeDuration} ·{' '}
-                  {selectedHabits.length} Habits
+                  Start: {formattedStartDate} · Days {startDay}–{endDay} of{" "}
+                  {safeDuration} · {selectedHabits.length} Habits
                 </p>
               </div>
 
@@ -187,7 +170,7 @@ export default function PrintableSheetPages({
                           )}
                           <span
                             className={`${
-                              isCompact ? 'text-[10px]' : 'text-xs'
+                              isCompact ? "text-[10px]" : "text-xs"
                             } font-bold text-slate-800 leading-none block`}
                           >
                             {bottom}
@@ -215,7 +198,9 @@ export default function PrintableSheetPages({
                       </td>
 
                       {page.dayNumbers.map((dayNum) => {
-                        const isChecked = Boolean(checkedCells[`${habit.id}-${dayNum}`]);
+                        const isChecked = Boolean(
+                          checkedCells[`${habit.id}-${dayNum}`],
+                        );
                         return (
                           <td
                             key={dayNum}
@@ -224,11 +209,15 @@ export default function PrintableSheetPages({
                             <div
                               className={`${circleSizeClass} mx-auto rounded-full flex items-center justify-center ${
                                 isChecked
-                                  ? 'bg-[#183f2e] text-white border border-[#183f2e]'
-                                  : 'border border-slate-300 bg-white'
+                                  ? "bg-[#183f2e] text-white border border-[#183f2e]"
+                                  : "border border-slate-300 bg-white"
                               }`}
                             >
-                              {isChecked && <Check className={`${iconSizeClass} stroke-[3]`} />}
+                              {isChecked && (
+                                <Check
+                                  className={`${iconSizeClass} stroke-[3]`}
+                                />
+                              )}
                             </div>
                           </td>
                         );
@@ -261,7 +250,8 @@ export default function PrintableSheetPages({
             {/* Sheet Footer Notes */}
             <div className="px-5 py-2.5 border-t border-slate-200 bg-[#fafcf9] flex items-center justify-between gap-4 text-[11px] text-slate-500">
               <span>
-                Habitora · Daily Consistency Sheet (Page {page.pageNumber}/{page.totalPages})
+                Habitora · Daily Consistency Sheet (Page {page.pageNumber}/
+                {page.totalPages})
               </span>
               <span className="font-mono tabular-nums">
                 Score: ____ / {selectedHabits.length * page.dayNumbers.length}

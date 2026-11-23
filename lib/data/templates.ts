@@ -26,7 +26,7 @@ export const SHEET_TEMPLATES: SheetTemplate[] = [
     title: '30-Day Fitness & Hydration',
     subtitle: 'Track daily movement, steps, protein, and hydration in one printable grid.',
     durationDays: 30,
-    habits: [
+    habits: [ 
       { id: 'tmpl_fh_1', name: '30 min workout or brisk walk', category: 'Health', color: '#2fe196', active: true, targetPerWeek: 6 },
       { id: 'tmpl_fh_2', name: '8,000+ daily steps', category: 'Health', color: '#38bdf8', active: true, targetPerWeek: 7 },
       { id: 'tmpl_fh_3', name: 'Drink 2.5L water', category: 'Health', color: '#34d399', active: true, targetPerWeek: 7 },

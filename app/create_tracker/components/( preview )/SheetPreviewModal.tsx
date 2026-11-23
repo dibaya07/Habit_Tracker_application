@@ -1,22 +1,18 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { Download, Eye, FileSpreadsheet, TrendingUp, X } from 'lucide-react';
-import { DayLabelMode, Habit } from '@/lib/types/tracker';
-import PrintableSheetPages from './PrintableSheetPages';
-import HabitProgressGraph from './HabitProgressGraph';
-import { useSheetContext } from '../context/context';
+import React, { useState } from "react";
+import { Download, Eye, FileSpreadsheet, TrendingUp, X } from "lucide-react";
+import { Habit } from "@/lib/types/tracker";
+import { useSheetContext } from "../../context/context";
+import HabitProgressGraph from "../( graph )/HabitProgressGraph";
+import PrintableSheetPages from "./PrintableSheetPages";
 
 interface SheetPreviewModalProps {
   isOpen: boolean;
-  initialView?: 'sheet' | 'graph';
+  initialView?: "sheet" | "graph";
   onClose: () => void;
   onDownload: () => void;
-  // trackerName: string;
-  // durationDays: number;
   startDate: string;
-  // dayLabelMode: DayLabelMode;
-  // includeGraph: boolean;
   selectedHabits: Habit[];
   checkedCells: Record<string, boolean>;
   plottedZeroDays: Record<number, boolean>;
@@ -24,25 +20,26 @@ interface SheetPreviewModalProps {
 
 export default function SheetPreviewModal({
   isOpen,
-  initialView = 'sheet',
+  initialView = "sheet",
   onClose,
   onDownload,
-  // trackerName,
-  // durationDays,
   startDate,
-  // dayLabelMode,
-  // includeGraph,
   selectedHabits,
   checkedCells,
   plottedZeroDays,
 }: SheetPreviewModalProps) {
-  const [activeView, setActiveView] = useState<'sheet' | 'graph'>(initialView);
-  const {initialValue, trackerName, setTrackerName,customDaysInput, setCustomDaysInput, customStartDate, setCustomStartDate,dayLabelMode, setDayLabelMode, includeGraph, setIncludeGraph,visibleDayCount,extraDaysCount, effectiveDays,isCustomDuration, setIsCustomDuration, selectedDuration, setSelectedDuration, isSubmitting, setIsSubmitting,confirmDeleteHabitId, setConfirmDeleteHabitId} = useSheetContext()
+  const [activeView, setActiveView] = useState<"sheet" | "graph">(initialView);
+  const {
+
+    includeGraph,
+    effectiveDays,
+  } = useSheetContext();
 
   if (!isOpen) return null;
 
-  const pageCountLabel = effectiveDays > 30 ? '2 Pages (A4 Landscape)' : '1 Page (A4 Landscape)';
-  const effectiveView = includeGraph ? activeView : 'sheet';
+  const pageCountLabel =
+    effectiveDays > 30 ? "2 Pages (A4 Landscape)" : "1 Page (A4 Landscape)";
+  const effectiveView = includeGraph ? activeView : "sheet";
   const visibleGraphDays = Math.min(10, Math.max(1, effectiveDays));
   const extraGraphDays = Math.max(0, effectiveDays - visibleGraphDays);
 
@@ -56,12 +53,13 @@ export default function SheetPreviewModal({
           </div>
           <div>
             <h2 className="font-editorial text-lg sm:text-xl font-normal text-[#123524] dark:text-white leading-tight">
-              {effectiveView === 'graph'
-                ? 'Progress Graph Preview'
+              {effectiveView === "graph"
+                ? "Progress Graph Preview"
                 : `Sheet Preview · ${pageCountLabel}`}
             </h2>
             <p className="text-xs text-slate-500 dark:text-emerald-300/75">
-              This is how your sheet will look when printed or downloaded as PDF.
+              This is how your sheet will look when printed or downloaded as
+              PDF.
             </p>
           </div>
         </div>
@@ -71,11 +69,11 @@ export default function SheetPreviewModal({
             <div className="inline-flex items-center p-1 rounded-xl bg-slate-100 dark:bg-emerald-950/60 border border-slate-200 dark:border-emerald-800/50">
               <button
                 type="button"
-                onClick={() => setActiveView('sheet')}
+                onClick={() => setActiveView("sheet")}
                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
-                  effectiveView === 'sheet'
-                    ? 'bg-[#183f2e] dark:bg-[#2fe196] text-white dark:text-[#071912]'
-                    : 'text-slate-600 dark:text-emerald-200'
+                  effectiveView === "sheet"
+                    ? "bg-[#183f2e] dark:bg-[#2fe196] text-white dark:text-[#071912]"
+                    : "text-slate-600 dark:text-emerald-200"
                 }`}
               >
                 <FileSpreadsheet className="w-3.5 h-3.5" />
@@ -83,11 +81,11 @@ export default function SheetPreviewModal({
               </button>
               <button
                 type="button"
-                onClick={() => setActiveView('graph')}
+                onClick={() => setActiveView("graph")}
                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
-                  effectiveView === 'graph'
-                    ? 'bg-[#183f2e] dark:bg-[#2fe196] text-white dark:text-[#071912]'
-                    : 'text-slate-600 dark:text-emerald-200'
+                  effectiveView === "graph"
+                    ? "bg-[#183f2e] dark:bg-[#2fe196] text-white dark:text-[#071912]"
+                    : "text-slate-600 dark:text-emerald-200"
                 }`}
               >
                 <TrendingUp className="w-3.5 h-3.5" />
@@ -118,14 +116,11 @@ export default function SheetPreviewModal({
         </div>
       </div>
 
-      {effectiveView === 'graph' ? (
+      {effectiveView === "graph" ? (
         <div className="w-full max-w-6xl rounded-2xl bg-white text-[#123524] border border-slate-200 shadow-2xl overflow-x-auto custom-scrollbar">
           <HabitProgressGraph
             habits={selectedHabits}
-            // visibleDayCount={visibleGraphDays}
-            // extraDaysCount={extraGraphDays}
             startDate={startDate}
-            // dayLabelMode={dayLabelMode}
             checkedCells={checkedCells}
             plottedZeroDays={plottedZeroDays}
             forceLight={true}
@@ -134,11 +129,7 @@ export default function SheetPreviewModal({
         </div>
       ) : (
         <PrintableSheetPages
-          // trackerName={trackerName}
-          // durationDays={durationDays}
           startDate={startDate}
-          // dayLabelMode={dayLabelMode}
-          // includeGraph={includeGraph}
           selectedHabits={selectedHabits}
           checkedCells={checkedCells}
           plottedZeroDays={plottedZeroDays}
