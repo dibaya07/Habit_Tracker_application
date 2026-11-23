@@ -9,51 +9,33 @@ import {
 } from "@/lib/utils/date";
 import { Check, Trash2 } from "lucide-react";
 import React, { useContext, useState } from "react";
-import { SheetContext } from "../../context/context";
+import { SheetContext, useSheetContext } from "../../context/context";
 
 interface DesktopViewHabitListProps {
-  //   trackerName: string;
-  durationDays: number;
+  // durationDays: number;
   startDate: string;
-  // dayLabelMode: DayLabelMode;
-  //   setDayLabelMode: (mode: DayLabelMode) => void;
-  //   includeGraph: boolean;
-  //   setIncludeGraph: (value: boolean) => void;
   selectedHabits: Habit[];
   handleRemoveHabit: (id: string) => void;
-  //   handleAddCustomHabit: (e: React.FormEvent) => void;
-  //   newHabitName: string;
-  //   setNewHabitName: (name: string) => void;
-  //   handleSelectSuggestedHabit: (name: string, category: HabitCategory) => void;
   checkedCells?: Record<string, boolean>;
   setCheckedCells?: React.Dispatch<
     React.SetStateAction<Record<string, boolean>>
   >;
-  //   plottedZeroDays?: Record<number, boolean>;
   setPlottedZeroDays?: React.Dispatch<
     React.SetStateAction<Record<number, boolean>>
   >;
-  //   onOpenPreview?: (mode: 'sheet' | 'graph') => void;
-  confirmDeleteHabitId: string | null;
-  setConfirmDeleteHabitId: (value: null | string) => void;
+  // confirmDeleteHabitId: string | null;
+  // setConfirmDeleteHabitId: (value: null | string) => void;
 }
 
 export default function DesktopViewHabitList({
-  durationDays,
   selectedHabits,
-  confirmDeleteHabitId,
-  setConfirmDeleteHabitId,
   handleRemoveHabit,
   checkedCells: externalCheckedCells,
   setCheckedCells: externalSetCheckedCells,
   setPlottedZeroDays: externalSetPlottedZeroDays,
-  // dayLabelMode,
   startDate,
 }: DesktopViewHabitListProps) {
-
-     const sheetContext = useContext(SheetContext)
-  const visibleDayCount = Math.min(10, Math.max(1, durationDays));
-  const extraDaysCount = Math.max(0, durationDays - visibleDayCount);
+  const {initialValue, trackerName, setTrackerName,customDaysInput, setCustomDaysInput, customStartDate, setCustomStartDate,dayLabelMode, setDayLabelMode, includeGraph, setIncludeGraph,visibleDayCount,extraDaysCount, effectiveDays,isCustomDuration, setIsCustomDuration, selectedDuration, setSelectedDuration, isSubmitting, setIsSubmitting,confirmDeleteHabitId, setConfirmDeleteHabitId} = useSheetContext();
 
   const daysArray = Array.from({ length: visibleDayCount }, (_, i) => i + 1);
 
@@ -73,7 +55,7 @@ export default function DesktopViewHabitList({
   // const formattedStartDate = formatUtcFullDate(baseDate);
 
   const getDayHeader = (dayNum: number) => {
-    if (sheetContext?.dayLabelMode === "numbers") {
+    if (dayLabelMode === "numbers") {
       return {
         top: "",
         bottom: String(dayNum),

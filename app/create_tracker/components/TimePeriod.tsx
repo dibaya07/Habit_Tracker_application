@@ -1,32 +1,24 @@
-'use client';
+"use client";
 
-import React, { useContext } from 'react';
-import { Calendar } from 'lucide-react';
-import { SheetContext } from '../context/context';
-
-interface TimePeriodProp {
-  selectedDuration: number;
-  isCustomDuration: boolean;
-  setIsCustomDuration: (value: boolean) => void;
-  // customDaysInput: string;
-  // setCustomDaysInput: (value: string) => void;
-  setSelectedDuration: (value: number) => void;
-}
+import React, { useContext } from "react";
+import { Calendar } from "lucide-react";
+import { SheetContext, useSheetContext } from "../context/context";
 
 const DURATION_OPTIONS = [
-  { days: 21, label: '21 Days' },
-  { days: 30, label: '30 Days' },
+  { days: 21, label: "21 Days" },
+  { days: 30, label: "30 Days" },
 ];
 
-export default function TimePeriod({
-  selectedDuration,
-  isCustomDuration,
-  setIsCustomDuration,
-  // customDaysInput,
-  // setCustomDaysInput,
-  setSelectedDuration,
-}: TimePeriodProp) {
-  const sheetContext = useContext(SheetContext)
+export default function TimePeriod() {
+  const {
+    customDaysInput,
+    setCustomDaysInput,
+    isCustomDuration,
+    setIsCustomDuration,
+    selectedDuration,
+    setSelectedDuration,
+  } = useSheetContext();
+
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-2">
@@ -43,7 +35,8 @@ export default function TimePeriod({
 
       <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#fafcf9] dark:bg-emerald-950/60 border border-[#dce8df] dark:border-emerald-900/50">
         {DURATION_OPTIONS.map((option) => {
-          const isActive = !isCustomDuration && selectedDuration === option.days;
+          const isActive =
+            !isCustomDuration && selectedDuration === option.days;
           return (
             <button
               key={option.days}
@@ -54,8 +47,8 @@ export default function TimePeriod({
               }}
               className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
                 isActive
-                  ? 'bg-[#183f2e] dark:bg-[#2fe196] text-white dark:text-[#071912] shadow-2xs'
-                  : 'text-slate-600 dark:text-emerald-200/80 hover:text-[#123524] dark:hover:text-white'
+                  ? "bg-[#183f2e] dark:bg-[#2fe196] text-white dark:text-[#071912] shadow-2xs"
+                  : "text-slate-600 dark:text-emerald-200/80 hover:text-[#123524] dark:hover:text-white"
               }`}
             >
               <span className="font-mono tabular-nums">{option.label}</span>
@@ -70,13 +63,15 @@ export default function TimePeriod({
               type="number"
               min={1}
               max={365}
-              value={sheetContext?.customDaysInput}
-              onChange={(e) => sheetContext?.setCustomDaysInput(e.target.value)}
+              value={customDaysInput}
+              onChange={(e) => setCustomDaysInput(e.target.value)}
               aria-label="Custom number of days"
               autoFocus
               className="w-12 bg-transparent border-b border-white/60 dark:border-[#071912]/60 text-center text-xs font-mono font-bold tabular-nums focus:outline-none"
             />
-            <span className="text-[11px] font-medium whitespace-nowrap">days</span>
+            <span className="text-[11px] font-medium whitespace-nowrap">
+              days
+            </span>
           </div>
         ) : (
           <button

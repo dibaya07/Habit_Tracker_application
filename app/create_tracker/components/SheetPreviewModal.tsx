@@ -5,17 +5,18 @@ import { Download, Eye, FileSpreadsheet, TrendingUp, X } from 'lucide-react';
 import { DayLabelMode, Habit } from '@/lib/types/tracker';
 import PrintableSheetPages from './PrintableSheetPages';
 import HabitProgressGraph from './HabitProgressGraph';
+import { useSheetContext } from '../context/context';
 
 interface SheetPreviewModalProps {
   isOpen: boolean;
   initialView?: 'sheet' | 'graph';
   onClose: () => void;
   onDownload: () => void;
-  trackerName: string;
-  durationDays: number;
+  // trackerName: string;
+  // durationDays: number;
   startDate: string;
-  dayLabelMode: DayLabelMode;
-  includeGraph: boolean;
+  // dayLabelMode: DayLabelMode;
+  // includeGraph: boolean;
   selectedHabits: Habit[];
   checkedCells: Record<string, boolean>;
   plottedZeroDays: Record<number, boolean>;
@@ -26,23 +27,24 @@ export default function SheetPreviewModal({
   initialView = 'sheet',
   onClose,
   onDownload,
-  trackerName,
-  durationDays,
+  // trackerName,
+  // durationDays,
   startDate,
-  dayLabelMode,
-  includeGraph,
+  // dayLabelMode,
+  // includeGraph,
   selectedHabits,
   checkedCells,
   plottedZeroDays,
 }: SheetPreviewModalProps) {
   const [activeView, setActiveView] = useState<'sheet' | 'graph'>(initialView);
+  const {initialValue, trackerName, setTrackerName,customDaysInput, setCustomDaysInput, customStartDate, setCustomStartDate,dayLabelMode, setDayLabelMode, includeGraph, setIncludeGraph,visibleDayCount,extraDaysCount, effectiveDays,isCustomDuration, setIsCustomDuration, selectedDuration, setSelectedDuration, isSubmitting, setIsSubmitting,confirmDeleteHabitId, setConfirmDeleteHabitId} = useSheetContext()
 
   if (!isOpen) return null;
 
-  const pageCountLabel = durationDays > 30 ? '2 Pages (A4 Landscape)' : '1 Page (A4 Landscape)';
+  const pageCountLabel = effectiveDays > 30 ? '2 Pages (A4 Landscape)' : '1 Page (A4 Landscape)';
   const effectiveView = includeGraph ? activeView : 'sheet';
-  const visibleGraphDays = Math.min(10, Math.max(1, durationDays));
-  const extraGraphDays = Math.max(0, durationDays - visibleGraphDays);
+  const visibleGraphDays = Math.min(10, Math.max(1, effectiveDays));
+  const extraGraphDays = Math.max(0, effectiveDays - visibleGraphDays);
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-start p-3 sm:p-6 lg:p-8 overflow-y-auto bg-black/75 backdrop-blur-sm print:static print:inset-auto print:p-0 print:bg-transparent print:backdrop-blur-none print:block">
@@ -120,10 +122,10 @@ export default function SheetPreviewModal({
         <div className="w-full max-w-6xl rounded-2xl bg-white text-[#123524] border border-slate-200 shadow-2xl overflow-x-auto custom-scrollbar">
           <HabitProgressGraph
             habits={selectedHabits}
-            visibleDayCount={visibleGraphDays}
-            extraDaysCount={extraGraphDays}
+            // visibleDayCount={visibleGraphDays}
+            // extraDaysCount={extraGraphDays}
             startDate={startDate}
-            dayLabelMode={dayLabelMode}
+            // dayLabelMode={dayLabelMode}
             checkedCells={checkedCells}
             plottedZeroDays={plottedZeroDays}
             forceLight={true}
@@ -132,11 +134,11 @@ export default function SheetPreviewModal({
         </div>
       ) : (
         <PrintableSheetPages
-          trackerName={trackerName}
-          durationDays={durationDays}
+          // trackerName={trackerName}
+          // durationDays={durationDays}
           startDate={startDate}
-          dayLabelMode={dayLabelMode}
-          includeGraph={includeGraph}
+          // dayLabelMode={dayLabelMode}
+          // includeGraph={includeGraph}
           selectedHabits={selectedHabits}
           checkedCells={checkedCells}
           plottedZeroDays={plottedZeroDays}

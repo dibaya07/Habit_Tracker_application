@@ -1,34 +1,20 @@
 import { Habit } from '@/lib/types/tracker';
 import { Trash2 } from 'lucide-react';
 import React from 'react'
+import { useSheetContext } from '../../context/context';
 
 
 interface HabitListMobileViewProps {
     selectedHabits: Habit[];
-    confirmDeleteHabitId: string | null;
-    setConfirmDeleteHabitId : (value: string | null)=>void,
+    // confirmDeleteHabitId: string | null;
+    // setConfirmDeleteHabitId : (value: string | null)=>void,
     handleRemoveHabit: (id: string) => void;
-//   trackerName: string;
-//   durationDays: number;
-//   startDate: string;
-//   dayLabelMode: DayLabelMode;
-//   setDayLabelMode: (mode: DayLabelMode) => void;
-//   includeGraph: boolean;
-//   setIncludeGraph: (value: boolean) => void;
-//   handleAddCustomHabit: (e: React.FormEvent) => void;
-//   newHabitName: string;
-//   setNewHabitName: (name: string) => void;
-//   handleSelectSuggestedHabit: (name: string, category: HabitCategory) => void;
-//   checkedCells?: Record<string, boolean>;
-//   setCheckedCells?: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
-//   plottedZeroDays?: Record<number, boolean>;
-//   setPlottedZeroDays?: React.Dispatch<React.SetStateAction<Record<number, boolean>>>;
-//   onOpenPreview?: (mode: 'sheet' | 'graph') => void;
 }
 
-export default function HabitListMobileView({selectedHabits, confirmDeleteHabitId, setConfirmDeleteHabitId, handleRemoveHabit}: HabitListMobileViewProps) {
+export default function HabitListMobileView({selectedHabits, handleRemoveHabit}: HabitListMobileViewProps) {
 
-    
+  const {initialValue, trackerName, setTrackerName,customDaysInput, setCustomDaysInput, customStartDate, setCustomStartDate,dayLabelMode, setDayLabelMode, includeGraph, setIncludeGraph,visibleDayCount,extraDaysCount, effectiveDays,isCustomDuration, setIsCustomDuration, selectedDuration, setSelectedDuration, isSubmitting, setIsSubmitting,confirmDeleteHabitId, setConfirmDeleteHabitId} = useSheetContext()  
+
   return (
     <div className="md:hidden divide-y divide-slate-200/70 dark:divide-emerald-900/30">
           {selectedHabits.map((habit, idx) => (

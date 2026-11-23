@@ -4,11 +4,11 @@ import React, { useContext, useState } from 'react';
 import ProgressLineGraph, { GraphDayPoint } from '@/components/tracker/ProgressLineGraph';
 import { DayLabelMode, Habit } from '@/lib/types/tracker';
 import { addUtcDays, getUtcDayNumber, getUtcWeekdayNarrow, parseUtcDate } from '@/lib/utils/date';
-import { SheetContext } from '../context/context';
+import { SheetContext, useSheetContext } from '../context/context';
 
 interface HabitProgressGraphProps {
   habits: Habit[];
-  durationDays: number;
+  // durationDays: number;
   // habits: Habit[];
   // visibleDayCount: number;
   dayNumbers?: number[];
@@ -32,7 +32,7 @@ interface HabitProgressGraphProps {
 
 export default function HabitProgressGraph({
   habits,
-  durationDays,
+  // durationDays,
   // visibleDayCount,
   dayNumbers,
   // extraDaysCount,
@@ -52,10 +52,12 @@ export default function HabitProgressGraph({
    setCheckedCells: externalSetCheckedCells,
   setPlottedZeroDays: externalSetPlottedZeroDays,
 }: HabitProgressGraphProps) {
-  const sheetContext = useContext(SheetContext)
+  // const sheetContext = useContext(SheetContext)
 
-  const visibleDayCount = Math.min(10, Math.max(1, durationDays));
-  const extraDaysCount = Math.max(0, durationDays - visibleDayCount);
+     const {initialValue, trackerName, setTrackerName,customDaysInput, setCustomDaysInput, customStartDate, setCustomStartDate,dayLabelMode, setDayLabelMode, includeGraph, setIncludeGraph,visibleDayCount,extraDaysCount, effectiveDays,isCustomDuration, setIsCustomDuration, selectedDuration, setSelectedDuration, isSubmitting, setIsSubmitting,confirmDeleteHabitId, setConfirmDeleteHabitId} = useSheetContext()
+
+  // const visibleDayCount = Math.min(10, Math.max(1, durationDays));
+  // const extraDaysCount = Math.max(0, durationDays - visibleDayCount);
   const [internalCheckedCells, setInternalCheckedCells] = useState<Record<string, boolean>>({});
     const [internalPlottedZeroDays, setInternalPlottedZeroDays] = useState<Record<number, boolean>>({});
 
@@ -72,7 +74,7 @@ export default function HabitProgressGraph({
     let topLabel = '';
     let bottomLabel = String(dayNum);
 
-    if (sheetContext?.dayLabelMode === 'dates') {
+    if (dayLabelMode === 'dates') {
       const d = addUtcDays(baseDate, dayNum - 1);
       topLabel = getUtcWeekdayNarrow(d);
       bottomLabel = String(getUtcDayNumber(d));

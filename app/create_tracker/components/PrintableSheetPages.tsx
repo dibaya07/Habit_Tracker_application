@@ -12,11 +12,11 @@ import {
 } from '@/lib/utils/date';
 import BrandMark from '@/components/ui/BrandMark';
 import HabitProgressGraph from './HabitProgressGraph';
-import { SheetContext } from '../context/context';
+import { SheetContext, useSheetContext } from '../context/context';
 
 interface PrintableSheetPagesProps {
   // trackerName: string;
-  durationDays: number;
+  // durationDays: number;
   startDate: string;
   // dayLabelMode: DayLabelMode;
   // includeGraph: boolean;
@@ -33,7 +33,7 @@ interface PageChunk {
 
 export default function PrintableSheetPages({
   // trackerName,
-  durationDays,
+  // durationDays,
   startDate,
   // dayLabelMode,
   // includeGraph,
@@ -41,8 +41,19 @@ export default function PrintableSheetPages({
   checkedCells,
   plottedZeroDays,
 }: PrintableSheetPagesProps) {
-    const sheetContext = useContext(SheetContext)
-  const safeDuration = Math.max(1, Math.min(365, durationDays));
+   const {
+      trackerName,
+      customDaysInput,
+      customStartDate,
+      dayLabelMode,
+      includeGraph,
+      setIncludeGraph,
+      visibleDayCount,
+      effectiveDays
+  
+    } = useSheetContext();
+    // const sheetContext = useContext(SheetContext)
+  const safeDuration = Math.max(1, Math.min(365, effectiveDays));
 
   // If durationDays <= 30 -> render everything on 1 single page.
   // If durationDays > 30 -> split cleanly across 2 pages.
@@ -76,7 +87,7 @@ export default function PrintableSheetPages({
   const formattedStartDate = formatUtcFullDate(baseDate);
 
   const getDayHeader = (dayNum: number) => {
-    if (sheetContext?.dayLabelMode === 'numbers') {
+    if (dayLabelMode === 'numbers') {
       return { top: '', bottom: String(dayNum) };
     }
     const d = addUtcDays(baseDate, dayNum - 1);
@@ -110,9 +121,9 @@ export default function PrintableSheetPages({
             {/* Sheet Header */}
             <div className="px-6 py-4 border-b border-slate-200 bg-[#fafcf9] flex flex-wrap items-center justify-between gap-4">
               <div className="min-w-0 space-y-1">
-                {sheetContext?.trackerName.trim() ? (
+                {trackerName.trim() ? (
                   <h1 className="font-editorial text-xl sm:text-2xl font-normal text-[#123524] break-words">
-                    {sheetContext.trackerName.trim()}
+                    {trackerName.trim()}
                   </h1>
                 ) : (
                   <div className="flex items-baseline gap-2.5 pt-1 pb-0.5">
@@ -229,14 +240,14 @@ export default function PrintableSheetPages({
             </div>
 
             {/* Optional Progress Graph (Light Paper) */}
-            {sheetContext?.includeGraph && (
+            {includeGraph && (
               <HabitProgressGraph
                 habits={selectedHabits}
-                visibleDayCount={page.dayNumbers.length}
+                // visibleDayCount={visibleDayCount}
                 dayNumbers={page.dayNumbers}
-                extraDaysCount={0}
+                // extraDaysCount={0}
                 startDate={startDate}
-                dayLabelMode={dayLabelMode}
+                // dayLabelMode={dayLabelMode}
                 checkedCells={checkedCells}
                 plottedZeroDays={plottedZeroDays}
                 leftColClassName={leftColClass}

@@ -5,7 +5,7 @@ import { CalendarDays, ChevronDown } from 'lucide-react';
 import { DayLabelMode } from '@/lib/types/tracker';
 
 interface DayLabelDropdownProps {
-  value: DayLabelMode;
+  value: DayLabelMode | undefined;
   onChange: (mode: DayLabelMode) => void;
   id?: string;
 }

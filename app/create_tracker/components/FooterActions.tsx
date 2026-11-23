@@ -3,11 +3,12 @@ import { Habit } from "@/lib/types/tracker";
 import { Download, Eye, Loader2, Save, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import React from "react";
+import { useSheetContext } from "../context/context";
 
 interface FooterActionsProp {
   isSubmitting: boolean;
   setPreviewMode: (value: "sheet" | "graph" | null) => void;
-  includeGraph: boolean;
+  // includeGraph: boolean;
   handleDownloadSheet: () => void;
   handleSaveNow: () => void;
   selectedHabits: Habit[];
@@ -16,11 +17,20 @@ interface FooterActionsProp {
 export default function FooterActions({
   isSubmitting,
   setPreviewMode,
-  includeGraph,
+  // includeGraph,
   handleDownloadSheet,
   handleSaveNow,
   selectedHabits,
 }: FooterActionsProp) {
+   const {
+      // trackerName,
+      // customDaysInput,
+      // customStartDate,
+      // dayLabelMode,
+      includeGraph,
+      // setIncludeGraph,
+  
+    } = useSheetContext();
   return (
     <div className="no-print pt-6 border-t border-slate-200 dark:border-emerald-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <Link

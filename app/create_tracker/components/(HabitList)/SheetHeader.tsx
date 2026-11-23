@@ -3,36 +3,17 @@ import BrandMark from "@/components/ui/BrandMark";
 import { DayLabelMode } from "@/lib/types/tracker";
 import { formatUtcFullDate, parseUtcDate } from "@/lib/utils/date";
 import React, { useContext } from "react";
-import { SheetContext } from "../../context/context";
+import { SheetContext, useSheetContext } from "../../context/context";
 
 interface SheetHeaderProps {
-  // trackerName: string;
-  //   durationDays: number;
   startDate: string;
-  // dayLabelMode: DayLabelMode;
-  // setDayLabelMode: (mode: DayLabelMode) => void;
-  //   includeGraph: boolean;
-  //   setIncludeGraph: (value: boolean) => void;
-  //   selectedHabits: Habit[];
-  //   handleRemoveHabit: (id: string) => void;
-  //   handleAddCustomHabit: (e: React.FormEvent) => void;
-  //   newHabitName: string;
-  //   setNewHabitName: (name: string) => void;
-  //   handleSelectSuggestedHabit: (name: string, category: HabitCategory) => void;
-  //   checkedCells?: Record<string, boolean>;
-  //   setCheckedCells?: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
-  //   plottedZeroDays?: Record<number, boolean>;
-  //   setPlottedZeroDays?: React.Dispatch<React.SetStateAction<Record<number, boolean>>>;
-  //   onOpenPreview?: (mode: 'sheet' | 'graph') => void;
 }
 
 export default function SheetHeader({
-  // trackerName,
-  // dayLabelMode,
-  // setDayLabelMode,
   startDate,
 }: SheetHeaderProps) {
-   const sheetContext = useContext(SheetContext)
+  //  const sheetContext = useContext(SheetContext)
+   const {trackerName,dayLabelMode,setDayLabelMode } = useSheetContext()
   const baseDate = parseUtcDate(startDate);
   const formattedStartDate = formatUtcFullDate(baseDate);
 
@@ -41,9 +22,9 @@ export default function SheetHeader({
       <div className="flex items-start sm:items-center gap-3 min-w-0">
         <BrandMark size={30} />
         <div className="min-w-0 space-y-1 flex-1">
-          {sheetContext?.trackerName.trim() ? (
+          {trackerName.trim() ? (
             <h2 className="font-editorial text-xl sm:text-2xl font-normal text-[#123524] dark:text-white break-words">
-              {sheetContext.trackerName.trim()}
+              {trackerName.trim()}
             </h2>
           ) : (
             <div className="flex items-baseline gap-2 pt-0.5">
@@ -70,8 +51,8 @@ export default function SheetHeader({
         </span>
         <DayLabelDropdown
           id="create-sheet-day-label-mode"
-          value={sheetContext?.dayLabelMode}
-          onChange={sheetContext?.setDayLabelMode}
+          value={dayLabelMode}
+          onChange={setDayLabelMode}
         />
       </div>
     </div>
