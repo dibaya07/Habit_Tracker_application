@@ -3,8 +3,8 @@ import Link from 'next/link'
 import React from 'react'
 
 interface HeaderIntroProp {
-    length: Number,
-    days: Number
+    length: number,
+    days: number
 }
 
 export default function HeaderIntro({length,days} : HeaderIntroProp) {
