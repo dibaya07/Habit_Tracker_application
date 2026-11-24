@@ -6,7 +6,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { AlertCircle, X, LogIn, UserPlus } from 'lucide-react';
 import { useHabitTracker } from '../../lib/context/HabitTrackerContext';
 import BrandMark from '@/components/ui/BrandMark';
-import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
+import GoogleSignInButton from '../auth/GoogleSignInButton';
+// import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
 
 export const AuthModal: React.FC = () => {
   const router = useRouter();

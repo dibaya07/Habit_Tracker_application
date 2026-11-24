@@ -1,6 +1,15 @@
-'use client';
+"use client";
 
-import React, { createContext, useContext, useState, useEffect, useMemo, useCallback, useRef, useSyncExternalStore } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  useRef,
+  useSyncExternalStore,
+} from "react";
 import {
   Habit,
   HabitCategory,
@@ -12,21 +21,24 @@ import {
   FeedbackSubmission,
   ActionHistoryEntry,
   ActionHistoryType,
-} from '../types/tracker';
-import { SITE_CONFIG } from '../data/site-config';
+} from "../types/tracker";
+import { SITE_CONFIG } from "../data/site-config";
 import {
   addUtcDays,
   formatUtcShortDate,
   getLocalTodayYmd,
   getUtcWeekdayShort,
   parseUtcDate,
-} from '../utils/date';
-import { applyAutoMissedDays, getDaysElapsedForIndex } from '../utils/auto-missed';
-import { validateEmailAddress, validatePersonName } from '../utils/validation';
+} from "../utils/date";
+import {
+  applyAutoMissedDays,
+  getDaysElapsedForIndex,
+} from "../utils/auto-missed";
+import { validateEmailAddress, validatePersonName } from "../utils/validation";
 
 interface HabitTrackerContextType {
   hasMounted: boolean;
-  theme: 'dark' | 'light';
+  theme: "dark" | "light";
   toggleTheme: () => void;
   tracker: HabitTracker;
   savedTrackers: HabitTracker[];
@@ -38,8 +50,8 @@ interface HabitTrackerContextType {
   pendingVerificationEmail: string | null;
   authPromptMessage: string | null;
   analytics: AnalyticsData;
-  activeView: 'tracker' | 'analytics' | 'print' | 'plan';
-  setActiveView: (view: 'tracker' | 'analytics' | 'print' | 'plan') => void;
+  activeView: "tracker" | "analytics" | "print" | "plan";
+  setActiveView: (view: "tracker" | "analytics" | "print" | "plan") => void;
   // Modals
   isCreateModalOpen: boolean;
   setIsCreateModalOpen: (open: boolean) => void;
@@ -54,7 +66,11 @@ interface HabitTrackerContextType {
   setIsSummaryReportOpen: (open: boolean) => void;
   // Tracker operations
   toggleCell: (habitId: string, dayIndex: number) => void;
-  setCellStatus: (habitId: string, dayIndex: number, status: TrackingStatus) => void;
+  setCellStatus: (
+    habitId: string,
+    dayIndex: number,
+    status: TrackingStatus,
+  ) => void;
   addHabit: (name: string, category: HabitCategory) => void;
   editHabit: (id: string, updates: Partial<Habit>) => void;
   deleteHabit: (id: string) => void;
@@ -64,7 +80,7 @@ interface HabitTrackerContextType {
     startDate: string,
     initialHabits?: Habit[],
     dayLabelMode?: DayLabelMode,
-    includeGraph?: boolean
+    includeGraph?: boolean,
   ) => void;
   setDayLabelMode: (mode: DayLabelMode) => void;
   setIncludeGraph: (include: boolean) => void;
@@ -92,62 +108,101 @@ interface HabitTrackerContextType {
   verifyEmailCode: (code: string) => boolean;
   logout: () => void;
   // Feedback & Action History
-  submitFeedback: (feedback: Omit<FeedbackSubmission, 'id' | 'createdAt'>) => void;
+  submitFeedback: (
+    feedback: Omit<FeedbackSubmission, "id" | "createdAt">,
+  ) => void;
   feedbacks: FeedbackSubmission[];
   actionHistory: ActionHistoryEntry[];
   recordHistoryAction: (
     type: ActionHistoryType,
     title: string,
     detail: string,
-    sheetName?: string
+    sheetName?: string,
   ) => void;
   clearActionHistory: () => void;
 }
 
-const HabitTrackerContext = createContext<HabitTrackerContextType | undefined>(undefined);
+const HabitTrackerContext = createContext<HabitTrackerContextType | undefined>(
+  undefined,
+);
 
 // Initial seed tracker
 const createInitialTracker = (): HabitTracker => {
   const habits: Habit[] = [
-    { id: 'h1', name: 'Exercise', category: 'Health', color: '#2fe196', active: true, targetPerWeek: 6 },
-    { id: 'h2', name: 'Meditation', category: 'Wellness', color: '#38bdf8', active: true, targetPerWeek: 7 },
-    { id: 'h3', name: 'Read a book', category: 'Learning', color: '#a78bfa', active: true, targetPerWeek: 5 },
-    { id: 'h4', name: 'Drink water', category: 'Health', color: '#34d399', active: true, targetPerWeek: 7 },
-    { id: 'h5', name: 'Healthy food', category: 'Health', color: '#fbbf24', active: true, targetPerWeek: 7 },
+    {
+      id: "h1",
+      name: "Exercise",
+      // category: "Health",
+      // color: "#2fe196",
+      active: true,
+      // targetPerWeek: 6,
+    },
+    {
+      id: "h2",
+      name: "Meditation",
+      // category: "Wellness",
+      // color: "#38bdf8",
+      active: true,
+      // targetPerWeek: 7,
+    },
+    {
+      id: "h3",
+      name: "Read a book",
+      // category: "Learning",
+      // color: "#a78bfa",
+      active: true,
+      // targetPerWeek: 5,
+    },
+    {
+      id: "h4",
+      name: "Drink water",
+      // category: "Health",
+      // color: "#34d399",
+      active: true,
+      // targetPerWeek: 7,
+    },
+    {
+      id: "h5",
+      name: "Healthy food",
+      // category: "Health",
+      // color: "#fbbf24",
+      active: true,
+      // targetPerWeek: 7,
+    },
   ];
 
   const tracking: Record<string, Record<number, TrackingStatus>> = {};
 
-  habits.forEach((h, hIdx) => {
-    tracking[h.id] = {};
-    for (let day = 1; day <= 30; day++) {
-      if (day > 25) {
-        if (day === 26) {
-          tracking[h.id][day] = hIdx % 2 === 0 ? 'completed' : 'empty';
-        } else {
-          tracking[h.id][day] = 'empty';
-        }
-      } else {
-        const seedValue = (day * 7 + hIdx * 13) % 10;
-        if (seedValue > 8) {
-          tracking[h.id][day] = 'failed';
-        } else if (seedValue > 1) {
-          tracking[h.id][day] = 'completed';
-        } else {
-          tracking[h.id][day] = 'empty';
-        }
-      }
-    }
-  });
+  // habits.forEach((h, hIdx) => {
+  //   tracking[h.id] = {};
+  //   for (let day = 1; day <= 30; day++) {
+  //     if (day > 25) {
+  //       if (day === 26) {
+  //         tracking[h.id][day] = hIdx % 2 === 0 ? 'completed' : 'empty';
+  //       } else {
+  //         tracking[h.id][day] = 'empty';
+  //       }
+  //     } else {
+  //       const seedValue = (day * 7 + hIdx * 13) % 10;
+  //       if (seedValue > 8) {
+  //         tracking[h.id][day] = 'failed';
+  //       } else if (seedValue > 1) {
+  //         tracking[h.id][day] = 'completed';
+  //       } else {
+  //         tracking[h.id][day] = 'empty';
+  //       }
+  //     }
+  //   }
+  // });
 
   return {
-    id: 'tracker-default',
-    name: 'Daily Habit Tracker',
-    startDate: '2026-04-21',
+    id: "tracker-default",
+    name: "Daily Habit Tracker",
+    startDate: "2026-04-21",
     durationDays: 30,
     habits,
     tracking,
-    notes: 'Stay consistent. Focus on progress over perfection.',
+    notes: "Stay consistent. Focus on progress over perfection.",
   };
 };
 
@@ -159,7 +214,7 @@ const EMPTY_HISTORY: ActionHistoryEntry[] = [];
 const emptySubscribe = () => () => {};
 
 function readStoredJson<T>(key: string, fallback: T): T {
-  if (typeof window === 'undefined') return fallback;
+  if (typeof window === "undefined") return fallback;
   try {
     const raw = localStorage.getItem(key);
     return raw ? (JSON.parse(raw) as T) : fallback;
@@ -177,12 +232,12 @@ interface StoredLocalAccount {
 }
 
 async function hashCredential(value: string): Promise<string> {
-  if (typeof window !== 'undefined' && window.crypto?.subtle) {
+  if (typeof window !== "undefined" && window.crypto?.subtle) {
     const encoded = new TextEncoder().encode(`habitora_v1:${value}`);
-    const digest = await window.crypto.subtle.digest('SHA-256', encoded);
+    const digest = await window.crypto.subtle.digest("SHA-256", encoded);
     return Array.from(new Uint8Array(digest))
-      .map((b) => b.toString(16).padStart(2, '0'))
-      .join('');
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
   }
   let hash = 2166136261;
   for (let i = 0; i < value.length; i++) {
@@ -192,45 +247,54 @@ async function hashCredential(value: string): Promise<string> {
   return `fnv_${(hash >>> 0).toString(16)}`;
 }
 
-export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const hasMounted = useSyncExternalStore(
     emptySubscribe,
     () => true,
-    () => false
+    () => false,
   );
 
-  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
-    if (typeof window === 'undefined') return 'light';
+  const [theme, setTheme] = useState<"dark" | "light">(() => {
+    if (typeof window === "undefined") return "light";
     try {
-      const saved = localStorage.getItem('habitora_theme');
-      if (saved === 'dark' || saved === 'light') return saved;
+      const saved = localStorage.getItem("habitora_theme");
+      if (saved === "dark" || saved === "light") return saved;
     } catch {}
-    return 'light';
+    return "light";
   });
 
   const [tracker, setTracker] = useState<HabitTracker>(() =>
-    readStoredJson<HabitTracker>('habitora_tracker', INITIAL_TRACKER)
+    readStoredJson<HabitTracker>("habitora_tracker", INITIAL_TRACKER),
   );
 
   const [savedTrackers, setSavedTrackers] = useState<HabitTracker[]>(() => {
-    const list = readStoredJson<HabitTracker[]>('habitora_saved_trackers', []);
+    const list = readStoredJson<HabitTracker[]>("habitora_saved_trackers", []);
     if (Array.isArray(list) && list.length > 0) return list;
-    return [readStoredJson<HabitTracker>('habitora_tracker', INITIAL_TRACKER)];
+    return [readStoredJson<HabitTracker>("habitora_tracker", INITIAL_TRACKER)];
   });
 
   const [user, setUser] = useState<UserAccount | null>(() => {
-    const stored = readStoredJson<UserAccount | null>('habitora_user', null);
-    if (stored && stored.name === 'Habitora Member') {
-      return { ...stored, name: 'Profile' };
+    const stored = readStoredJson<UserAccount | null>("habitora_user", null);
+    if (stored && stored.name === "Habitora Member") {
+      return { ...stored, name: "Profile" };
     }
     return stored;
   });
 
   const [verificationCodeSent, setVerificationCodeSent] = useState(false);
-  const [pendingVerificationEmail, setPendingVerificationEmail] = useState<string | null>(null);
-  const [simulatedSecretCode, setSimulatedSecretCode] = useState<string>('842109');
-  const [activeView, setActiveView] = useState<'tracker' | 'analytics' | 'print' | 'plan'>('tracker');
-  const [authPromptMessage, setAuthPromptMessage] = useState<string | null>(null);
+  const [pendingVerificationEmail, setPendingVerificationEmail] = useState<
+    string | null
+  >(null);
+  const [simulatedSecretCode, setSimulatedSecretCode] =
+    useState<string>("842109");
+  const [activeView, setActiveView] = useState<
+    "tracker" | "analytics" | "print" | "plan"
+  >("tracker");
+  const [authPromptMessage, setAuthPromptMessage] = useState<string | null>(
+    null,
+  );
   const pendingAuthCallbackRef = useRef<(() => void) | null>(null);
 
   // Modals state
@@ -240,14 +304,19 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [isManageHabitsOpen, setIsManageHabitsOpen] = useState(false);
   const [isSummaryReportOpen, setIsSummaryReportOpen] = useState(false);
   const [feedbacks, setFeedbacks] = useState<FeedbackSubmission[]>(() =>
-    readStoredJson<FeedbackSubmission[]>('habitora_feedback', [])
+    readStoredJson<FeedbackSubmission[]>("habitora_feedback", []),
   );
   const [actionHistory, setActionHistory] = useState<ActionHistoryEntry[]>(() =>
-    readStoredJson<ActionHistoryEntry[]>('habitora_action_history', [])
+    readStoredJson<ActionHistoryEntry[]>("habitora_action_history", []),
   );
 
   const appendHistory = useCallback(
-    (type: ActionHistoryType, title: string, detail: string, sheetName?: string) => {
+    (
+      type: ActionHistoryType,
+      title: string,
+      detail: string,
+      sheetName?: string,
+    ) => {
       const entry: ActionHistoryEntry = {
         id: `act_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
         type,
@@ -259,18 +328,18 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
       setActionHistory((prev) => {
         const next = [entry, ...prev].slice(0, 100);
         try {
-          localStorage.setItem('habitora_action_history', JSON.stringify(next));
+          localStorage.setItem("habitora_action_history", JSON.stringify(next));
         } catch {}
         return next;
       });
     },
-    []
+    [],
   );
 
   const clearActionHistory = useCallback(() => {
     setActionHistory([]);
     try {
-      localStorage.removeItem('habitora_action_history');
+      localStorage.removeItem("habitora_action_history");
     } catch {}
   }, []);
 
@@ -284,36 +353,39 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   }, []);
 
-  const openAuthModal = useCallback((message?: string, onAfterSignIn?: () => void) => {
-    setAuthPromptMessage(message || null);
-    pendingAuthCallbackRef.current = onAfterSignIn || null;
-    setIsAuthModalOpenState(true);
-  }, []);
+  const openAuthModal = useCallback(
+    (message?: string, onAfterSignIn?: () => void) => {
+      setAuthPromptMessage(message || null);
+      pendingAuthCallbackRef.current = onAfterSignIn || null;
+      setIsAuthModalOpenState(true);
+    },
+    [],
+  );
 
   // Update theme class on HTML and body elements
   useEffect(() => {
-    if (!hasMounted || typeof document === 'undefined') return;
+    if (!hasMounted || typeof document === "undefined") return;
     const root = document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-      root.classList.remove('light');
-      document.body.classList.add('dark');
-      document.body.classList.remove('light');
+    if (theme === "dark") {
+      root.classList.add("dark");
+      root.classList.remove("light");
+      document.body.classList.add("dark");
+      document.body.classList.remove("light");
     } else {
-      root.classList.add('light');
-      root.classList.remove('dark');
-      document.body.classList.add('light');
-      document.body.classList.remove('dark');
+      root.classList.add("light");
+      root.classList.remove("dark");
+      document.body.classList.add("light");
+      document.body.classList.remove("dark");
     }
     try {
-      localStorage.setItem('habitora_theme', theme);
+      localStorage.setItem("habitora_theme", theme);
     } catch {
       // ignore
     }
   }, [theme, hasMounted]);
 
   const toggleTheme = useCallback(() => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
   }, []);
 
   // Sync helper to update savedTrackers alongside active tracker
@@ -324,7 +396,10 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
         ? prev.map((t) => (t.id === updatedTracker.id ? updatedTracker : t))
         : [updatedTracker, ...prev];
       try {
-        localStorage.setItem('habitora_saved_trackers', JSON.stringify(nextList));
+        localStorage.setItem(
+          "habitora_saved_trackers",
+          JSON.stringify(nextList),
+        );
       } catch {}
       return nextList;
     });
@@ -335,27 +410,29 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
     (newTracker: HabitTracker) => {
       setTracker(newTracker);
       try {
-        localStorage.setItem('habitora_tracker', JSON.stringify(newTracker));
+        localStorage.setItem("habitora_tracker", JSON.stringify(newTracker));
       } catch {
         // ignore
       }
       syncSavedTrackers(newTracker);
     },
-    [syncSavedTrackers]
+    [syncSavedTrackers],
   );
 
   const selectTracker = useCallback(
     (id: string) => {
       const found = savedTrackers.find((t) => t.id === id);
       if (found) {
-        const normalized = hasMounted ? applyAutoMissedDays(found, getLocalTodayYmd()) : found;
+        const normalized = hasMounted
+          ? applyAutoMissedDays(found, getLocalTodayYmd())
+          : found;
         setTracker(normalized);
         try {
-          localStorage.setItem('habitora_tracker', JSON.stringify(normalized));
+          localStorage.setItem("habitora_tracker", JSON.stringify(normalized));
         } catch {}
       }
     },
-    [savedTrackers, hasMounted]
+    [savedTrackers, hasMounted],
   );
 
   const renameTracker = useCallback(
@@ -366,10 +443,13 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
       setSavedTrackers((prevList) => {
         const nextList = prevList.map((item) =>
-          item.id === id ? { ...item, name: trimmed } : item
+          item.id === id ? { ...item, name: trimmed } : item,
         );
         try {
-          localStorage.setItem('habitora_saved_trackers', JSON.stringify(nextList));
+          localStorage.setItem(
+            "habitora_saved_trackers",
+            JSON.stringify(nextList),
+          );
         } catch {}
         return nextList;
       });
@@ -378,19 +458,21 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
         if (prev.id !== id) return prev;
         const updated = { ...prev, name: trimmed };
         try {
-          localStorage.setItem('habitora_tracker', JSON.stringify(updated));
+          localStorage.setItem("habitora_tracker", JSON.stringify(updated));
         } catch {}
         return updated;
       });
 
       appendHistory(
-        'sheet_renamed',
-        'Renamed Sheet',
-        previous ? `Renamed "${previous}" to "${trimmed}"` : `Renamed sheet to "${trimmed}"`,
-        trimmed
+        "sheet_renamed",
+        "Renamed Sheet",
+        previous
+          ? `Renamed "${previous}" to "${trimmed}"`
+          : `Renamed sheet to "${trimmed}"`,
+        trimmed,
       );
     },
-    [savedTrackers, appendHistory]
+    [savedTrackers, appendHistory],
   );
 
   const deleteSavedTracker = useCallback(
@@ -400,19 +482,27 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const nextList = savedTrackers.filter((t) => t.id !== id);
       setSavedTrackers(nextList);
       try {
-        localStorage.setItem('habitora_saved_trackers', JSON.stringify(nextList));
+        localStorage.setItem(
+          "habitora_saved_trackers",
+          JSON.stringify(nextList),
+        );
       } catch {}
       if (tracker.id === id && nextList[0]) {
         setTracker(nextList[0]);
         try {
-          localStorage.setItem('habitora_tracker', JSON.stringify(nextList[0]));
+          localStorage.setItem("habitora_tracker", JSON.stringify(nextList[0]));
         } catch {}
       }
       if (target) {
-        appendHistory('sheet_deleted', 'Deleted Sheet', `Removed "${target.name}" (${target.durationDays} days)`, target.name);
+        appendHistory(
+          "sheet_deleted",
+          "Deleted Sheet",
+          `Removed "${target.name}" (${target.durationDays} days)`,
+          target.name,
+        );
       }
     },
-    [savedTrackers, tracker.id, appendHistory]
+    [savedTrackers, tracker.id, appendHistory],
   );
 
   // Cell toggle:
@@ -420,19 +510,24 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
   // Otherwise: 'empty' -> 'completed' -> 'failed' -> 'empty'.
   const toggleCell = useCallback(
     (habitId: string, dayIndex: number) => {
-      const habitName = tracker.habits.find((h) => h.id === habitId)?.name || 'Habit';
-      const current = tracker.tracking[habitId]?.[dayIndex] || 'empty';
-      const daysElapsed = getDaysElapsedForIndex(tracker.startDate, dayIndex, getLocalTodayYmd());
+      const habitName =
+        tracker.habits.find((h) => h.id === habitId)?.name || "Habit";
+      const current = tracker.tracking[habitId]?.[dayIndex] || "empty";
+      const daysElapsed = getDaysElapsedForIndex(
+        tracker.startDate,
+        dayIndex,
+        getLocalTodayYmd(),
+      );
       const next: TrackingStatus =
         daysElapsed >= 2
-          ? current === 'completed'
-            ? 'failed'
-            : 'completed'
-          : current === 'completed'
-          ? 'failed'
-          : current === 'failed'
-          ? 'empty'
-          : 'completed';
+          ? current === "completed"
+            ? "failed"
+            : "completed"
+          : current === "completed"
+            ? "failed"
+            : current === "failed"
+              ? "empty"
+              : "completed";
 
       setTracker((prev) => {
         const habitDays = { ...(prev.tracking[habitId] || {}) };
@@ -445,20 +540,35 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
           },
         };
         try {
-          localStorage.setItem('habitora_tracker', JSON.stringify(updated));
+          localStorage.setItem("habitora_tracker", JSON.stringify(updated));
         } catch {}
         syncSavedTrackers(updated);
         return updated;
       });
 
       appendHistory(
-        next === 'completed' ? 'habit_completed' : next === 'failed' ? 'habit_missed' : 'habit_cleared',
-        next === 'completed' ? 'Marked Habit Completed' : next === 'failed' ? 'Marked Habit Missed' : 'Cleared Habit Mark',
+        next === "completed"
+          ? "habit_completed"
+          : next === "failed"
+            ? "habit_missed"
+            : "habit_cleared",
+        next === "completed"
+          ? "Marked Habit Completed"
+          : next === "failed"
+            ? "Marked Habit Missed"
+            : "Cleared Habit Mark",
         `${habitName} · Day ${dayIndex}`,
-        tracker.name
+        tracker.name,
       );
     },
-    [tracker.habits, tracker.tracking, tracker.startDate, tracker.name, syncSavedTrackers, appendHistory]
+    [
+      tracker.habits,
+      tracker.tracking,
+      tracker.startDate,
+      tracker.name,
+      syncSavedTrackers,
+      appendHistory,
+    ],
   );
 
   const setCellStatus = useCallback(
@@ -474,13 +584,13 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
           },
         };
         try {
-          localStorage.setItem('habitora_tracker', JSON.stringify(updated));
+          localStorage.setItem("habitora_tracker", JSON.stringify(updated));
         } catch {}
         syncSavedTrackers(updated);
         return updated;
       });
     },
-    [syncSavedTrackers]
+    [syncSavedTrackers],
   );
 
   const addHabit = useCallback(
@@ -488,17 +598,24 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const trimmed = name.trim();
       if (!trimmed) return;
       const newId = `h_${Date.now()}`;
-      const colors = ['#2fe196', '#38bdf8', '#a78bfa', '#fbbf24', '#f43f5e', '#34d399'];
+      const colors = [
+        "#2fe196",
+        "#38bdf8",
+        "#a78bfa",
+        "#fbbf24",
+        "#f43f5e",
+        "#34d399",
+      ];
 
       setTracker((prev) => {
         const color = colors[prev.habits.length % colors.length];
         const newHabit: Habit = {
           id: newId,
           name: trimmed,
-          category,
-          color,
+          // category,
+          // color,
           active: true,
-          targetPerWeek: 7,
+          // targetPerWeek: 7,
         };
 
         const rawUpdated: HabitTracker = {
@@ -512,33 +629,49 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
         const updated = applyAutoMissedDays(rawUpdated, getLocalTodayYmd());
         try {
-          localStorage.setItem('habitora_tracker', JSON.stringify(updated));
+          localStorage.setItem("habitora_tracker", JSON.stringify(updated));
         } catch {}
         syncSavedTrackers(updated);
         return updated;
       });
 
-      appendHistory('habit_added', 'Added Habit', `Added "${trimmed}" to sheet`, tracker.name);
+      appendHistory(
+        "habit_added",
+        "Added Habit",
+        `Added "${trimmed}" to sheet`,
+        tracker.name,
+      );
     },
-    [syncSavedTrackers, appendHistory, tracker.name]
+    [syncSavedTrackers, appendHistory, tracker.name],
   );
 
   const editHabit = useCallback(
     (id: string, updates: Partial<Habit>) => {
       const updated: HabitTracker = {
         ...tracker,
-        habits: tracker.habits.map((h) => (h.id === id ? { ...h, ...updates } : h)),
+        habits: tracker.habits.map((h) =>
+          h.id === id ? { ...h, ...updates } : h,
+        ),
       };
       saveTracker(updated);
-      const targetName = updates.name || tracker.habits.find((h) => h.id === id)?.name || 'Habit';
-      appendHistory('habit_edited', 'Updated Habit', `Updated "${targetName}"`, tracker.name);
+      const targetName =
+        updates.name ||
+        tracker.habits.find((h) => h.id === id)?.name ||
+        "Habit";
+      appendHistory(
+        "habit_edited",
+        "Updated Habit",
+        `Updated "${targetName}"`,
+        tracker.name,
+      );
     },
-    [tracker, saveTracker, appendHistory]
+    [tracker, saveTracker, appendHistory],
   );
 
   const deleteHabit = useCallback(
     (id: string) => {
-      const targetName = tracker.habits.find((h) => h.id === id)?.name || 'Habit';
+      const targetName =
+        tracker.habits.find((h) => h.id === id)?.name || "Habit";
       const updatedHabits = tracker.habits.filter((h) => h.id !== id);
       const updatedTracking = { ...tracker.tracking };
       delete updatedTracking[id];
@@ -549,9 +682,14 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
         tracking: updatedTracking,
       };
       saveTracker(updated);
-      appendHistory('habit_deleted', 'Removed Habit', `Removed "${targetName}" from sheet`, tracker.name);
+      appendHistory(
+        "habit_deleted",
+        "Removed Habit",
+        `Removed "${targetName}" from sheet`,
+        tracker.name,
+      );
     },
-    [tracker, saveTracker, appendHistory]
+    [tracker, saveTracker, appendHistory],
   );
 
   const createTracker = useCallback(
@@ -560,18 +698,20 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
       durationDays: number,
       startDate: string,
       initialHabits?: Habit[],
-      dayLabelMode: DayLabelMode = 'dates',
-      includeGraph: boolean = true
+      dayLabelMode: DayLabelMode = "dates",
+      includeGraph: boolean = true,
     ) => {
       const habitsToUse =
-        initialHabits && initialHabits.length > 0 ? initialHabits : SITE_CONFIG.defaultHabits;
+        initialHabits && initialHabits.length > 0
+          ? initialHabits
+          : SITE_CONFIG.defaultHabits;
 
       const newTracking: Record<string, Record<number, TrackingStatus>> = {};
       habitsToUse.forEach((h) => {
-        newTracking[h.id] = {};
+        // newTracking[h.id] = {};
       });
 
-      const sheetName = name.trim() || 'My Habit Tracker';
+      const sheetName = name.trim() || "My Habit Tracker";
       const boundedDays = Math.max(1, Math.min(365, durationDays));
       const rawTracker: HabitTracker = {
         id: `tracker_${Date.now()}`,
@@ -585,16 +725,16 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
       };
       const newTracker = applyAutoMissedDays(rawTracker, getLocalTodayYmd());
       saveTracker(newTracker);
-      setActiveView('tracker');
+      setActiveView("tracker");
       setIsCreateModalOpen(false);
       appendHistory(
-        'sheet_created',
-        'Created Habit Sheet',
+        "sheet_created",
+        "Created Habit Sheet",
         `Created ${boundedDays}-day sheet with ${habitsToUse.length} habits`,
-        sheetName
+        sheetName,
       );
     },
-    [saveTracker, appendHistory]
+    [saveTracker, appendHistory],
   );
 
   const setDayLabelMode = useCallback(
@@ -605,7 +745,7 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
       };
       saveTracker(updated);
     },
-    [tracker, saveTracker]
+    [tracker, saveTracker],
   );
 
   const setIncludeGraph = useCallback(
@@ -616,12 +756,15 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
       };
       saveTracker(updated);
     },
-    [tracker, saveTracker]
+    [tracker, saveTracker],
   );
 
   const extendPlan = useCallback(
     (newDuration: number) => {
-      const clamped = Math.max(tracker.durationDays, Math.min(365, newDuration));
+      const clamped = Math.max(
+        tracker.durationDays,
+        Math.min(365, newDuration),
+      );
       if (clamped > tracker.durationDays) {
         const previousDays = tracker.durationDays;
         const rawUpdated: HabitTracker = {
@@ -631,20 +774,20 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
         const updated = applyAutoMissedDays(rawUpdated, getLocalTodayYmd());
         saveTracker(updated);
         appendHistory(
-          'sheet_extended',
-          'Extended Sheet Duration',
+          "sheet_extended",
+          "Extended Sheet Duration",
           `Extended plan from ${previousDays} days to ${clamped} days (+${clamped - previousDays}d)`,
-          tracker.name
+          tracker.name,
         );
       }
     },
-    [tracker, saveTracker, appendHistory]
+    [tracker, saveTracker, appendHistory],
   );
 
   const resetTrackerData = useCallback(() => {
     const clearedTracking: Record<string, Record<number, TrackingStatus>> = {};
     tracker.habits.forEach((h) => {
-      clearedTracking[h.id] = {};
+      // clearedTracking[h.id] = {};
     });
     const rawUpdated: HabitTracker = {
       ...tracker,
@@ -652,26 +795,35 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
     const updated = applyAutoMissedDays(rawUpdated, getLocalTodayYmd());
     saveTracker(updated);
-    appendHistory('sheet_reset', 'Reset Sheet Progress', `Cleared ticks on "${tracker.name}"`, tracker.name);
+    appendHistory(
+      "sheet_reset",
+      "Reset Sheet Progress",
+      `Cleared ticks on "${tracker.name}"`,
+      tracker.name,
+    );
   }, [tracker, saveTracker, appendHistory]);
 
   // Quick sign-in; returns true if a custom post-auth callback ran
   const quickSignIn = useCallback((): boolean => {
     const newUser: UserAccount = {
-      email: 'member@habitora.app',
-      name: 'Profile',
+      email: "member@habitora.app",
+      name: "Profile",
       isVerified: true,
       createdAt: new Date().toISOString(),
-      memberTier: 'Pro',
-      dailyGoal: 'Complete all daily habits consistently',
-      bio: 'Building daily discipline and tracking progress one day at a time.',
+      memberTier: "Pro",
+      dailyGoal: "Complete all daily habits consistently",
+      bio: "Building daily discipline and tracking progress one day at a time.",
     };
     setUser(newUser);
     try {
-      localStorage.setItem('habitora_user', JSON.stringify(newUser));
+      localStorage.setItem("habitora_user", JSON.stringify(newUser));
     } catch {}
 
-    appendHistory('signed_in', 'Signed In', 'Signed in via Quick Access workspace');
+    // appendHistory(
+    //   "signed_in",
+    //   "Signed In",
+    //   "Signed in via Quick Access workspace",
+    // );
 
     const pendingAction = pendingAuthCallbackRef.current;
     pendingAuthCallbackRef.current = null;
@@ -687,31 +839,44 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const signInWithGoogleAccount = useCallback(
     (profile: { name: string; email: string; avatarUrl?: string }): boolean => {
-      const emailCheck = validateEmailAddress(profile.email || '');
-      const cleanEmail = emailCheck.valid ? emailCheck.value : profile.email.trim().toLowerCase();
-      const nameCheck = validatePersonName(profile.name || '');
+      const emailCheck = validateEmailAddress(profile.email || "");
+      const cleanEmail = emailCheck.valid
+        ? emailCheck.value
+        : profile.email.trim().toLowerCase();
+      const nameCheck = validatePersonName(profile.name || "");
       const cleanName = nameCheck.valid
         ? nameCheck.value
-        : profile.name.replace(/[^\p{L}\s'’.-]/gu, '').trim() || 'Google Member';
+        : profile.name.replace(/[^\p{L}\s'’.-]/gu, "").trim() ||
+          "Google Member";
 
-      const existingStored = readStoredJson<UserAccount | null>('habitora_user', null);
+      const existingStored = readStoredJson<UserAccount | null>(
+        "habitora_user",
+        null,
+      );
       const googleUser: UserAccount = {
         email: cleanEmail,
         name: cleanName,
         isVerified: true,
         avatarUrl: profile.avatarUrl,
         createdAt: existingStored?.createdAt || new Date().toISOString(),
-        memberTier: existingStored?.memberTier || 'Pro',
-        dailyGoal: existingStored?.dailyGoal || 'Complete all daily habits consistently',
-        bio: existingStored?.bio || 'Building daily discipline and tracking progress one day at a time.',
+        memberTier: existingStored?.memberTier || "Pro",
+        dailyGoal:
+          existingStored?.dailyGoal || "Complete all daily habits consistently",
+        bio:
+          existingStored?.bio ||
+          "Building daily discipline and tracking progress one day at a time.",
       };
 
       setUser(googleUser);
       try {
-        localStorage.setItem('habitora_user', JSON.stringify(googleUser));
+        localStorage.setItem("habitora_user", JSON.stringify(googleUser));
       } catch {}
 
-      appendHistory('signed_in', 'Signed In', `Signed in with Google (${cleanEmail})`);
+      // appendHistory(
+      //   "signed_in",
+      //   "Signed In",
+      //   `Signed in with Google (${cleanEmail})`,
+      // );
 
       const pendingAction = pendingAuthCallbackRef.current;
       pendingAuthCallbackRef.current = null;
@@ -724,7 +889,7 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
       }
       return false;
     },
-    [appendHistory]
+    [appendHistory],
   );
 
   const signUpWithEmail = useCallback(
@@ -736,12 +901,18 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }): Promise<{ ok: boolean; error?: string }> => {
       const nameCheck = validatePersonName(input.name);
       if (!nameCheck.valid) {
-        return { ok: false, error: nameCheck.error || 'Please enter a valid full name.' };
+        return {
+          ok: false,
+          error: nameCheck.error || "Please enter a valid full name.",
+        };
       }
 
       const emailCheck = validateEmailAddress(input.email);
       if (!emailCheck.valid) {
-        return { ok: false, error: emailCheck.error || 'Please enter a valid email address.' };
+        return {
+          ok: false,
+          error: emailCheck.error || "Please enter a valid email address.",
+        };
       }
 
       const cleanName = nameCheck.value;
@@ -749,12 +920,19 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const cleanGoal = input.dailyGoal?.trim();
 
       if (input.password.length < 6) {
-        return { ok: false, error: 'Password must be at least 6 characters.' };
+        return { ok: false, error: "Password must be at least 6 characters." };
       }
 
-      const accounts = readStoredJson<StoredLocalAccount[]>('habitora_accounts', []);
+      const accounts = readStoredJson<StoredLocalAccount[]>(
+        "habitora_accounts",
+        [],
+      );
       if (accounts.some((acc) => acc.email.toLowerCase() === cleanEmail)) {
-        return { ok: false, error: 'An account with this email already exists. Please sign in instead.' };
+        return {
+          ok: false,
+          error:
+            "An account with this email already exists. Please sign in instead.",
+        };
       }
 
       const passwordHash = await hashCredential(input.password);
@@ -763,12 +941,15 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
         name: cleanName,
         email: cleanEmail,
         passwordHash,
-        dailyGoal: cleanGoal || 'Complete daily habits consistently',
+        dailyGoal: cleanGoal || "Complete daily habits consistently",
         createdAt,
       };
 
       try {
-        localStorage.setItem('habitora_accounts', JSON.stringify([nextAccount, ...accounts]));
+        localStorage.setItem(
+          "habitora_accounts",
+          JSON.stringify([nextAccount, ...accounts]),
+        );
       } catch {}
 
       const newUser: UserAccount = {
@@ -776,17 +957,21 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
         name: cleanName,
         isVerified: true,
         createdAt,
-        memberTier: 'Pro',
+        memberTier: "Pro",
         dailyGoal: nextAccount.dailyGoal,
-        bio: 'Building daily discipline and tracking progress one day at a time.',
+        bio: "Building daily discipline and tracking progress one day at a time.",
       };
 
       setUser(newUser);
       try {
-        localStorage.setItem('habitora_user', JSON.stringify(newUser));
+        localStorage.setItem("habitora_user", JSON.stringify(newUser));
       } catch {}
 
-      appendHistory('account_created', 'Created Account', `Created Habitora account for ${cleanEmail}`);
+      // appendHistory(
+      //   "account_created",
+      //   "Created Account",
+      //   `Created Habitora account for ${cleanEmail}`,
+      // );
 
       const pendingAction = pendingAuthCallbackRef.current;
       pendingAuthCallbackRef.current = null;
@@ -796,7 +981,7 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
       return { ok: true };
     },
-    [appendHistory]
+    [appendHistory],
   );
 
   const signInWithEmail = useCallback(
@@ -806,22 +991,34 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }): Promise<{ ok: boolean; error?: string }> => {
       const emailCheck = validateEmailAddress(input.email);
       if (!emailCheck.valid) {
-        return { ok: false, error: emailCheck.error || 'Please enter a valid email address.' };
+        return {
+          ok: false,
+          error: emailCheck.error || "Please enter a valid email address.",
+        };
       }
       const cleanEmail = emailCheck.value;
       if (!input.password) {
-        return { ok: false, error: 'Please enter your password.' };
+        return { ok: false, error: "Please enter your password." };
       }
 
-      const accounts = readStoredJson<StoredLocalAccount[]>('habitora_accounts', []);
-      const existing = accounts.find((acc) => acc.email.toLowerCase() === cleanEmail);
+      const accounts = readStoredJson<StoredLocalAccount[]>(
+        "habitora_accounts",
+        [],
+      );
+      const existing = accounts.find(
+        (acc) => acc.email.toLowerCase() === cleanEmail,
+      );
       if (!existing) {
-        return { ok: false, error: 'No account found with this email. Please create an account first.' };
+        return {
+          ok: false,
+          error:
+            "No account found with this email. Please create an account first.",
+        };
       }
 
       const candidateHash = await hashCredential(input.password);
       if (candidateHash !== existing.passwordHash) {
-        return { ok: false, error: 'Incorrect password. Please try again.' };
+        return { ok: false, error: "Incorrect password. Please try again." };
       }
 
       const loggedInUser: UserAccount = {
@@ -829,17 +1026,18 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
         name: existing.name,
         isVerified: true,
         createdAt: existing.createdAt,
-        memberTier: 'Pro',
-        dailyGoal: existing.dailyGoal || 'Complete all daily habits consistently',
-        bio: 'Building daily discipline and tracking progress one day at a time.',
+        memberTier: "Pro",
+        dailyGoal:
+          existing.dailyGoal || "Complete all daily habits consistently",
+        bio: "Building daily discipline and tracking progress one day at a time.",
       };
 
       setUser(loggedInUser);
       try {
-        localStorage.setItem('habitora_user', JSON.stringify(loggedInUser));
+        localStorage.setItem("habitora_user", JSON.stringify(loggedInUser));
       } catch {}
 
-      appendHistory('signed_in', 'Signed In', `Signed in as ${existing.email}`);
+      // appendHistory("signed_in", "Signed In", `Signed in as ${existing.email}`);
 
       const pendingAction = pendingAuthCallbackRef.current;
       pendingAuthCallbackRef.current = null;
@@ -849,7 +1047,7 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
       return { ok: true };
     },
-    [appendHistory]
+    [appendHistory],
   );
 
   const updateUserProfile = useCallback(
@@ -870,55 +1068,66 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
         if (!prev) return prev;
         const updated = { ...prev, ...normalizedUpdates };
         try {
-          localStorage.setItem('habitora_user', JSON.stringify(updated));
+          localStorage.setItem("habitora_user", JSON.stringify(updated));
         } catch {}
         return updated;
       });
-      appendHistory('profile_updated', 'Updated Profile', 'Saved profile account details');
+      appendHistory(
+        "profile_updated",
+        "Updated Profile",
+        "Saved profile account details",
+      );
     },
-    [appendHistory]
+    [appendHistory],
   );
 
-  const initiateEmailVerification = useCallback(async (email: string): Promise<boolean> => {
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    setSimulatedSecretCode(code);
-    setPendingVerificationEmail(email);
-    setVerificationCodeSent(true);
-    return true;
-  }, []);
+  const initiateEmailVerification = useCallback(
+    async (email: string): Promise<boolean> => {
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      setSimulatedSecretCode(code);
+      setPendingVerificationEmail(email);
+      setVerificationCodeSent(true);
+      return true;
+    },
+    [],
+  );
 
   const verifyEmailCode = useCallback(
     (code: string): boolean => {
-      if (code.trim() === simulatedSecretCode || code.trim() === '842109' || code.trim().length === 6) {
+      if (
+        code.trim() === simulatedSecretCode ||
+        code.trim() === "842109" ||
+        code.trim().length === 6
+      ) {
         const verifiedUser: UserAccount = {
-          email: pendingVerificationEmail || 'user@habitora.app',
-          name: (pendingVerificationEmail || 'User').split('@')[0],
+          email: pendingVerificationEmail || "user@habitora.app",
+          name: (pendingVerificationEmail || "User").split("@")[0],
           isVerified: true,
           createdAt: new Date().toISOString(),
-          memberTier: 'Pro',
+          memberTier: "Pro",
         };
         setUser(verifiedUser);
         setVerificationCodeSent(false);
         setPendingVerificationEmail(null);
         try {
-          localStorage.setItem('habitora_user', JSON.stringify(verifiedUser));
+          localStorage.setItem("habitora_user", JSON.stringify(verifiedUser));
         } catch {}
         return true;
       }
       return false;
     },
-    [simulatedSecretCode, pendingVerificationEmail]
+    [simulatedSecretCode, pendingVerificationEmail],
   );
 
   const logout = useCallback(() => {
     setUser(null);
     try {
-      localStorage.removeItem('habitora_user');
+      localStorage.removeItem("habitora_user");
     } catch {}
   }, []);
 
   const submitFeedback = useCallback(
-    (data: Omit<FeedbackSubmission, 'id' | 'createdAt'>) => {
+    (data: Omit<FeedbackSubmission, "id" | "createdAt">) => {
       const newFeedback: FeedbackSubmission = {
         ...data,
         id: `fb_${Date.now()}`,
@@ -928,21 +1137,21 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
       setFeedbacks((prev) => {
         const updated = [newFeedback, ...prev];
         try {
-          localStorage.setItem('habitora_feedback', JSON.stringify(updated));
+          localStorage.setItem("habitora_feedback", JSON.stringify(updated));
         } catch {}
         return updated;
       });
       appendHistory(
-        'feedback_submitted',
-        'Submitted Feedback',
-        `${data.category} (${data.rating}/5 stars)`
+        "feedback_submitted",
+        "Submitted Feedback",
+        `${data.category} (${data.rating}/5 stars)`,
       );
       setIsFeedbackModalOpen(false);
     },
-    [user, appendHistory]
+    [user, appendHistory],
   );
 
-  const effectiveTheme: 'dark' | 'light' = hasMounted ? theme : 'light';
+  const effectiveTheme: "dark" | "light" = hasMounted ? theme : "light";
   const effectiveTracker = useMemo(() => {
     if (!hasMounted) return INITIAL_TRACKER;
     return applyAutoMissedDays(tracker, getLocalTodayYmd());
@@ -957,9 +1166,15 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
     if (!hasMounted) return;
     try {
       if (effectiveTracker !== tracker) {
-        localStorage.setItem('habitora_tracker', JSON.stringify(effectiveTracker));
+        localStorage.setItem(
+          "habitora_tracker",
+          JSON.stringify(effectiveTracker),
+        );
       }
-      localStorage.setItem('habitora_saved_trackers', JSON.stringify(effectiveSavedTrackers));
+      localStorage.setItem(
+        "habitora_saved_trackers",
+        JSON.stringify(effectiveSavedTrackers),
+      );
     } catch {}
   }, [hasMounted, effectiveTracker, tracker, effectiveSavedTrackers]);
 
@@ -973,12 +1188,15 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const totalHabits = activeHabits.length;
     let totalCompleted = 0;
 
-    const habitStats: Record<string, { completed: number; totalDaysEvaluated: number }> = {};
+    const habitStats: Record<
+      string,
+      { completed: number; totalDaysEvaluated: number }
+    > = {};
     activeHabits.forEach((h) => {
-      habitStats[h.id] = { completed: 0, totalDaysEvaluated: 0 };
+      // habitStats[h.id] = { completed: 0, totalDaysEvaluated: 0 };
     });
 
-    const dailyScores: AnalyticsData['dailyScores'] = [];
+    const dailyScores: AnalyticsData["dailyScores"] = [];
     const baseDate = parseUtcDate(effectiveTracker.startDate);
 
     let currentStreakCount = 0;
@@ -990,15 +1208,15 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
       let dayHasAnyMark = false;
 
       activeHabits.forEach((h) => {
-        const status = effectiveTracker.tracking[h.id]?.[day] || 'empty';
-        if (status === 'completed') {
+        // const status = effectiveTracker.tracking[h.id]?.[day] || "empty";
+        if (status === "completed") {
           dayCompleted++;
           totalCompleted++;
-          habitStats[h.id].completed++;
-          habitStats[h.id].totalDaysEvaluated++;
+          // habitStats[h.id].completed++;
+          // habitStats[h.id].totalDaysEvaluated++;
           dayHasAnyMark = true;
-        } else if (status === 'failed') {
-          habitStats[h.id].totalDaysEvaluated++;
+        } else if (status === "failed") {
+          // habitStats[h.id].totalDaysEvaluated++;
           dayHasAnyMark = true;
         }
       });
@@ -1006,7 +1224,8 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const dayDate = addUtcDays(baseDate, day - 1);
       const dateStr = formatUtcShortDate(dayDate);
 
-      const dayPercentage = totalHabits > 0 ? Math.round((dayCompleted / totalHabits) * 100) : 0;
+      const dayPercentage =
+        totalHabits > 0 ? Math.round((dayCompleted / totalHabits) * 100) : 0;
       dailyScores.push({
         day,
         dateStr,
@@ -1042,31 +1261,40 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
 
     const totalPossible = totalHabits * effectiveTracker.durationDays;
-    const completionRate = totalPossible > 0 ? Math.round((totalCompleted / totalPossible) * 100) : 0;
+    const completionRate =
+      totalPossible > 0
+        ? Math.round((totalCompleted / totalPossible) * 100)
+        : 0;
 
     let bestHabit: { name: string; rate: number } | null = null;
     let weakestHabit: { name: string; rate: number } | null = null;
 
-    for (const h of activeHabits) {
-      const st = habitStats[h.id];
-      const rate = effectiveTracker.durationDays > 0 ? Math.round((st.completed / effectiveTracker.durationDays) * 100) : 0;
-      if (!bestHabit || rate > bestHabit.rate) {
-        bestHabit = { name: h.name, rate };
-      }
-      if (!weakestHabit || rate < weakestHabit.rate) {
-        weakestHabit = { name: h.name, rate };
-      }
-    }
+    // for (const h of activeHabits) {
+    //   // const st = habitStats[h.id];
+    //   const rate =
+    //     effectiveTracker.durationDays > 0
+    //       ? Math.round((st.completed / effectiveTracker.durationDays) * 100)
+    //       : 0;
+    //   if (!bestHabit || rate > bestHabit.rate) {
+    //     bestHabit = { name: h.name, rate };
+    //   }
+    //   if (!weakestHabit || rate < weakestHabit.rate) {
+    //     weakestHabit = { name: h.name, rate };
+    //   }
+    // }
 
     const categoryCount: Record<string, number> = {};
     activeHabits.forEach((h) => {
-      categoryCount[h.category] = (categoryCount[h.category] || 0) + 1;
+      // categoryCount[h.category] = (categoryCount[h.category] || 0) + 1;
     });
-    const categoryBreakdown = Object.entries(categoryCount).map(([category, count]) => ({
-      category: category as HabitCategory,
-      count,
-      percentage: totalHabits > 0 ? Math.round((count / totalHabits) * 100) : 0,
-    }));
+    const categoryBreakdown = Object.entries(categoryCount).map(
+      ([category, count]) => ({
+        category: category as HabitCategory,
+        count,
+        percentage:
+          totalHabits > 0 ? Math.round((count / totalHabits) * 100) : 0,
+      }),
+    );
 
     const weekTally: Record<string, { completed: number; total: number }> = {
       Mon: { completed: 0, total: 0 },
@@ -1087,9 +1315,18 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
       }
     });
 
-    const weeklyAverages = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((dayName) => {
+    const weeklyAverages = [
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat",
+      "Sun",
+    ].map((dayName) => {
       const item = weekTally[dayName];
-      const percentage = item.total > 0 ? Math.round((item.completed / item.total) * 100) : 0;
+      const percentage =
+        item.total > 0 ? Math.round((item.completed / item.total) * 100) : 0;
       return {
         dayName,
         completed: item.completed,
@@ -1101,41 +1338,61 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const smartSuggestions: string[] = [];
     if (completionRate >= 70) {
       smartSuggestions.push(
-        `High consistency achieved! You have completed ${completionRate}% of planned habits across this ${effectiveTracker.durationDays}-day cycle.`
+        `High consistency achieved! You have completed ${completionRate}% of planned habits across this ${effectiveTracker.durationDays}-day cycle.`,
       );
     } else {
       smartSuggestions.push(
-        `Your overall completion rate is currently ${completionRate}%. Focus on 1–2 keystone habits first to rebuild momentum.`
+        `Your overall completion rate is currently ${completionRate}%. Focus on 1–2 keystone habits first to rebuild momentum.`,
       );
     }
 
-    if (bestHabit) {
-      smartSuggestions.push(`Outstanding discipline with "${bestHabit.name}" (${bestHabit.rate}% completion).`);
-    }
+    // if (bestHabit) {
+    //   smartSuggestions.push(
+    //     `Outstanding discipline with "${bestHabit.name}" (${bestHabit.rate}% completion).`,
+    //   );
+    // }
 
-    if (weakestHabit && weakestHabit.name !== bestHabit?.name) {
-      smartSuggestions.push(
-        `"${weakestHabit.name}" has the lowest completion (${weakestHabit.rate}%). Consider lowering initial daily friction or tracking earlier in the day.`
-      );
-    }
+    // if (weakestHabit && weakestHabit.name !== bestHabit?.name) {
+    //   smartSuggestions.push(
+    //     `"${weakestHabit.name}" has the lowest completion (${weakestHabit.rate}%). Consider lowering initial daily friction or tracking earlier in the day.`,
+    //   );
+    // }
 
     if (currentStreakCount >= 7) {
-      smartSuggestions.push(`You have maintained a strong ${currentStreakCount}-day active streak. Keep the chain unbroken!`);
+      smartSuggestions.push(
+        `You have maintained a strong ${currentStreakCount}-day active streak. Keep the chain unbroken!`,
+      );
     }
 
     const weekdayAvg =
-      (['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].reduce((acc, d) => acc + weekTally[d].completed, 0) /
-        Math.max(1, ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].reduce((acc, d) => acc + weekTally[d].total, 0))) *
+      (["Mon", "Tue", "Wed", "Thu", "Fri"].reduce(
+        (acc, d) => acc + weekTally[d].completed,
+        0,
+      ) /
+        Math.max(
+          1,
+          ["Mon", "Tue", "Wed", "Thu", "Fri"].reduce(
+            (acc, d) => acc + weekTally[d].total,
+            0,
+          ),
+        )) *
       100;
     const weekendAvg =
-      (['Sat', 'Sun'].reduce((acc, d) => acc + weekTally[d].completed, 0) /
-        Math.max(1, ['Sat', 'Sun'].reduce((acc, d) => acc + weekTally[d].total, 0))) *
+      (["Sat", "Sun"].reduce((acc, d) => acc + weekTally[d].completed, 0) /
+        Math.max(
+          1,
+          ["Sat", "Sun"].reduce((acc, d) => acc + weekTally[d].total, 0),
+        )) *
       100;
 
     if (weekendAvg < weekdayAvg - 15) {
-      smartSuggestions.push('Consistency drops noticeably on weekends. Consider designing dedicated lightweight weekend habit anchors.');
+      smartSuggestions.push(
+        "Consistency drops noticeably on weekends. Consider designing dedicated lightweight weekend habit anchors.",
+      );
     } else if (weekendAvg > weekdayAvg) {
-      smartSuggestions.push('Strong weekend discipline detected — your leisure routines are supporting your personal growth.');
+      smartSuggestions.push(
+        "Strong weekend discipline detected — your leisure routines are supporting your personal growth.",
+      );
     }
 
     return {
@@ -1145,14 +1402,17 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
       completionRate: completionRate || 78,
       currentStreak: currentStreakCount || 12,
       longestStreak: longestStreakCount || 21,
-      bestPerformingHabit: bestHabit || { name: 'Exercise', rate: 90 },
-      weakestPerformingHabit: weakestHabit || { name: 'Drink water', rate: 60 },
+      bestPerformingHabit: bestHabit || { name: "Exercise", rate: 90 },
+      weakestPerformingHabit: weakestHabit || { name: "Drink water", rate: 60 },
       dailyScores,
-      categoryBreakdown: categoryBreakdown.length > 0 ? categoryBreakdown : [
-        { category: 'Health', count: 3, percentage: 60 },
-        { category: 'Wellness', count: 1, percentage: 20 },
-        { category: 'Learning', count: 1, percentage: 20 },
-      ],
+      categoryBreakdown:
+        categoryBreakdown.length > 0
+          ? categoryBreakdown
+          : [
+              { category: "Health", count: 3, percentage: 60 },
+              { category: "Wellness", count: 1, percentage: 20 },
+              { category: "Learning", count: 1, percentage: 20 },
+            ],
       weeklyAverages,
       smartSuggestions,
     };
@@ -1255,7 +1515,7 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
       effectiveHistory,
       appendHistory,
       clearActionHistory,
-    ]
+    ],
   );
 
   return (
@@ -1268,7 +1528,9 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
 export const useHabitTracker = () => {
   const context = useContext(HabitTrackerContext);
   if (!context) {
-    throw new Error('useHabitTracker must be used within a HabitTrackerProvider');
+    throw new Error(
+      "useHabitTracker must be used within a HabitTrackerProvider",
+    );
   }
   return context;
 };

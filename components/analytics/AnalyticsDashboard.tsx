@@ -56,19 +56,19 @@ export const AnalyticsDashboard: React.FC = () => {
   }, [filteredScores, points]);
 
   // Top Performing Habits (sorted)
-  const sortedHabitPerformances = useMemo(() => {
-    const list = tracker.habits.map((h) => {
-      let completed = 0;
-      for (let d = 1; d <= tracker.durationDays; d++) {
-        if (tracker.tracking[h.id]?.[d] === 'completed') {
-          completed++;
-        }
-      }
-      const rate = tracker.durationDays > 0 ? Math.round((completed / tracker.durationDays) * 100) : 0;
-      return { name: h.name, rate, category: h.category, color: h.color };
-    });
-    return list.sort((a, b) => b.rate - a.rate);
-  }, [tracker]);
+  // const sortedHabitPerformances = useMemo(() => {
+  //   const list = tracker.habits.map((h) => {
+  //     let completed = 0;
+  //     for (let d = 1; d <= tracker.durationDays; d++) {
+  //       if (tracker.tracking[h.id]?.[d] === 'completed') {
+  //         completed++;
+  //       }
+  //     }
+  //     const rate = tracker.durationDays > 0 ? Math.round((completed / tracker.durationDays) * 100) : 0;
+  //     return { name: h.name, rate, category: h.category, color: h.color };
+  //   });
+  //   return list.sort((a, b) => b.rate - a.rate);
+  // }, [tracker]);
 
   return (
     <section id="analytics" className="py-16 md:py-24 border-t border-emerald-950/20 dark:border-emerald-900/30">
@@ -267,7 +267,7 @@ export const AnalyticsDashboard: React.FC = () => {
             <h3 className="font-semibold text-slate-900 dark:text-white text-base">Top Performing Habits</h3>
             <p className="text-xs text-slate-500 dark:text-emerald-300/70">Completion consistency by individual habit</p>
 
-            <div className="space-y-3 pt-2">
+            {/* <div className="space-y-3 pt-2">
               {sortedHabitPerformances.map((habit, idx) => (
                 <div key={idx} className="space-y-1">
                   <div className="flex items-center justify-between text-xs">
@@ -284,7 +284,7 @@ export const AnalyticsDashboard: React.FC = () => {
                   </div>
                 </div>
               ))}
-            </div>
+            </div> */}
           </div>
 
         </div>

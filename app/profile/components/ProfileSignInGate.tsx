@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { AlertCircle, LogIn, User, UserPlus } from 'lucide-react';
-import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
+// import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
 
 interface ProfileSignInGateProps {
   onQuickSignIn: () => void;
@@ -36,10 +36,10 @@ export default function ProfileSignInGate({ onQuickSignIn }: ProfileSignInGatePr
         </div>
       )}
 
-      <GoogleSignInButton
+      {/* <GoogleSignInButton
         label="Continue with Google"
         onError={(msg) => setGoogleError(msg || null)}
-      />
+      /> */}
 
       <div className="flex flex-col sm:flex-row gap-3 pt-1">
         <Link

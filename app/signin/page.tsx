@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import React, { Suspense } from 'react';
+// import SignInClient from './components/SignInClient';
 import SignInClient from './components/SignInClient';
 
 export const metadata: Metadata = {

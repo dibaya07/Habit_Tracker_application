@@ -74,10 +74,10 @@ export default function DashboardOverview() {
     });
   })();
 
-  const dayCompletedCount = activeHabits.reduce(
-    (acc, h) => acc + (tracker.tracking[h.id]?.[activeDayIndex] === 'completed' ? 1 : 0),
-    0
-  );
+  // const dayCompletedCount = activeHabits.reduce(
+  //   (acc, h) => acc + (tracker.tracking[h.id]?.[activeDayIndex] === 'completed' ? 1 : 0),
+  //   0
+  // );
 
   return (
     <section
@@ -234,9 +234,9 @@ export default function DashboardOverview() {
               <h2 className="font-editorial text-xl sm:text-2xl text-[#123524] dark:text-white truncate">
                 {tracker.name}
               </h2>
-              <p className="text-xs text-slate-500 dark:text-emerald-300/75 font-mono tabular-nums">
+              {/* <p className="text-xs text-slate-500 dark:text-emerald-300/75 font-mono tabular-nums">
                 Day {activeDayIndex} of {tracker.durationDays} · {activeDayDate} · {dayCompletedCount}/{activeHabits.length} done
-              </p>
+              </p> */}
             </div>
 
             <div className="flex items-center gap-1.5 w-full sm:w-auto shrink-0">
@@ -274,13 +274,13 @@ export default function DashboardOverview() {
           {/* Interactive Habit Checklist */}
           <div className="flex flex-wrap gap-3">
             {activeHabits.map((habit, idx) => {
-              const status = tracker.tracking[habit.id]?.[activeDayIndex] || 'empty';
+              // const status = tracker.tracking[habit.id]?.[activeDayIndex] || 'empty';
               const isDone = status === 'completed';
               return (
                 <button
                   key={habit.id}
                   type="button"
-                  onClick={() => toggleCell(habit.id, activeDayIndex)}
+                  // onClick={() => toggleCell(habit.id, activeDayIndex)}
                   className={`w-full sm:w-[calc(50%-0.375rem)] min-h-[56px] flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border text-left transition-all cursor-pointer ${
                     isDone
                       ? 'bg-[#eaf3ed] dark:bg-emerald-900/35 border-[#183f2e]/40 dark:border-[#2fe196]/60'
@@ -373,7 +373,7 @@ export default function DashboardOverview() {
                   Today
                 </span>
                 <span className="font-mono tabular-nums text-xl font-bold text-[#123524] dark:text-white">
-                  {dayCompletedCount}/{activeHabits.length}
+                  {/* {dayCompletedCount}/{activeHabits.length} */}
                 </span>
               </div>
             </div>

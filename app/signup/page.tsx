@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import React, { Suspense } from 'react';
 import SignUpClient from './components/SignUpClient';
+// import SignUpClient from './components/SignUpClient';
 
 export const metadata: Metadata = {
   title: 'Sign Up',

@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { useHabitTracker } from '@/lib/context/HabitTrackerContext';
 import BrandMark from '@/components/ui/BrandMark';
-import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
+// import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
 import { filterEmailInput, validateEmailAddress } from '@/lib/utils/validation';
 
 export default function SignInClient() {
@@ -248,7 +248,7 @@ export default function SignInClient() {
       </div>
 
       <div className="flex flex-col gap-2.5">
-        <GoogleSignInButton
+        {/* <GoogleSignInButton
           label="Continue with Google"
           onSuccess={(handledCustom) => {
             if (!handledCustom) {
@@ -256,7 +256,7 @@ export default function SignInClient() {
             }
           }}
           onError={(msg) => setError(msg || null)}
-        />
+        /> */}
 
         <button
           type="button"

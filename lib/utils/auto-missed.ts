@@ -35,7 +35,7 @@ export function applyAutoMissedDays(
 
   for (const habit of tracker.habits) {
     if (!habit.active) continue;
-    const currentHabitDays = tracker.tracking[habit.id] || {};
+    // const currentHabitDays = tracker.tracking[habit.id] || {};
     let habitChanged = false;
     let updatedHabitDays: Record<number, TrackingStatus> | null = null;
 
@@ -45,22 +45,22 @@ export function applyAutoMissedDays(
         (todayUtc.getTime() - dayUtc.getTime()) / (1000 * 60 * 60 * 24)
       );
 
-      if (daysElapsed >= 2) {
-        const status = currentHabitDays[dayIndex];
-        if (!status || status === 'empty') {
-          if (!updatedHabitDays) {
-            updatedHabitDays = { ...currentHabitDays };
-          }
-          updatedHabitDays[dayIndex] = 'failed';
-          habitChanged = true;
-        }
-      }
+      // if (daysElapsed >= 2) {
+      //   const status = currentHabitDays[dayIndex];
+      //   if (!status || status === 'empty') {
+      //     if (!updatedHabitDays) {
+      //       updatedHabitDays = { ...currentHabitDays };
+      //     }
+      //     updatedHabitDays[dayIndex] = 'failed';
+      //     habitChanged = true;
+      //   }
+      // }
     }
 
-    if (habitChanged && updatedHabitDays) {
-      nextTracking[habit.id] = updatedHabitDays;
-      hasChanges = true;
-    }
+    // if (habitChanged && updatedHabitDays) {
+    //   nextTracking[habit.id] = updatedHabitDays;
+    //   hasChanges = true;
+    // }
   }
 
   if (!hasChanges) {

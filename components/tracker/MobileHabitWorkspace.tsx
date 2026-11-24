@@ -128,7 +128,7 @@ const MobileHabitWorkspace = React.memo(function MobileHabitWorkspace({
       {/* Touch-Friendly Mobile Habit Cards */}
       <div className="space-y-2.5">
         {activeHabits.map((habit, idx) => {
-          const status: TrackingStatus = tracking[habit.id]?.[clampedDay] || 'empty';
+          // const status: TrackingStatus = tracking[habit.id]?.[clampedDay] || 'empty';
           const isConfirming = confirmDeleteId === habit.id;
 
           return (
@@ -164,7 +164,7 @@ const MobileHabitWorkspace = React.memo(function MobileHabitWorkspace({
                 {/* Large 44px touch toggle button */}
                 <button
                   type="button"
-                  onClick={() => onToggleCell(habit.id, clampedDay)}
+                  // onClick={() => onToggleCell(habit.id, clampedDay)}
                   aria-label={`Mark ${habit.name} on day ${clampedDay}`}
                   className={`min-h-[44px] min-w-[44px] rounded-full flex items-center justify-center shrink-0 transition-transform active:scale-90 cursor-pointer ${
                     status === 'completed'
@@ -187,15 +187,15 @@ const MobileHabitWorkspace = React.memo(function MobileHabitWorkspace({
               {/* 5-day mini context strip + remove button */}
               <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/60 dark:border-emerald-900/30">
                 <div className="flex items-center gap-1.5">
-                  {windowDays.map((dNum) => {
-                    const st = tracking[habit.id]?.[dNum] || 'empty';
+                  {/* {windowDays.map((dNum) => {
+                    // const st = tracking[habit.id]?.[dNum] || 'empty';
                     return (
                       <button
                         key={dNum}
                         type="button"
                         onClick={() => {
                           setSelectedDay(dNum);
-                          onToggleCell(habit.id, dNum);
+                          // onToggleCell(habit.id, dNum);
                         }}
                         className={`px-2 py-1 rounded-lg text-[10px] font-mono tabular-nums transition-colors cursor-pointer ${
                           st === 'completed'
@@ -208,7 +208,7 @@ const MobileHabitWorkspace = React.memo(function MobileHabitWorkspace({
                         D{dNum}
                       </button>
                     );
-                  })}
+                  })} */}
                 </div>
 
                 {activeHabits.length > 1 && (
@@ -224,7 +224,7 @@ const MobileHabitWorkspace = React.memo(function MobileHabitWorkspace({
                       <button
                         type="button"
                         onClick={() => {
-                          onDeleteHabit(habit.id);
+                          // onDeleteHabit(habit.id);
                           setConfirmDeleteId(null);
                         }}
                         className="px-2 py-1 rounded-lg bg-rose-600 text-[11px] font-semibold text-white cursor-pointer"
@@ -235,7 +235,7 @@ const MobileHabitWorkspace = React.memo(function MobileHabitWorkspace({
                   ) : (
                     <button
                       type="button"
-                      onClick={() => setConfirmDeleteId(habit.id)}
+                      // onClick={() => setConfirmDeleteId(habit.id)}
                       aria-label={`Remove ${habit.name}`}
                       className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 cursor-pointer"
                     >

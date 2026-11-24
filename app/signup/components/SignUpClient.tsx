@@ -18,13 +18,17 @@ import {
 } from 'lucide-react';
 import { useHabitTracker } from '@/lib/context/HabitTrackerContext';
 import BrandMark from '@/components/ui/BrandMark';
+// import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
 import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
-import {
-  filterEmailInput,
-  filterNameInput,
-  validateEmailAddress,
-  validatePersonName,
-} from '@/lib/utils/validation';
+import { filterEmailInput, filterNameInput, validateEmailAddress, validatePersonName } from '@/lib/utils/validation';
+// import {
+//   filterEmailInput,
+//   filterNameInput,
+//   validateEmailAddress,
+//   validatePersonName,
+// } from '@/lib/utils/validation';
+
+
 
 export default function SignUpClient() {
   const router = useRouter();

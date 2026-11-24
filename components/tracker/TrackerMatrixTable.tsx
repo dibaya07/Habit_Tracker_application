@@ -138,7 +138,7 @@ const TrackerMatrixTable = React.memo(function TrackerMatrixTable({
                           <button
                             type="button"
                             onClick={() => {
-                              onDeleteHabit(habit.id);
+                              // onDeleteHabit(habit.id);
                               setConfirmDeleteId(null);
                             }}
                             className="px-1.5 py-0.5 rounded bg-rose-600 text-[10px] font-semibold text-white cursor-pointer"
@@ -149,7 +149,7 @@ const TrackerMatrixTable = React.memo(function TrackerMatrixTable({
                       ) : (
                         <button
                           type="button"
-                          onClick={() => setConfirmDeleteId(habit.id)}
+                          // onClick={() => setConfirmDeleteId(habit.id)}
                           title={`Remove ${habit.name}`}
                           aria-label={`Remove ${habit.name}`}
                           className="p-1 rounded text-slate-400 opacity-0 group-hover:opacity-100 focus:opacity-100 hover:text-rose-600 dark:hover:text-rose-400 transition-all shrink-0 cursor-pointer"
@@ -163,11 +163,11 @@ const TrackerMatrixTable = React.memo(function TrackerMatrixTable({
 
                 {/* Day Cells */}
                 {visibleDays.map((dayNum) => {
-                  const status: TrackingStatus = tracking[habit.id]?.[dayNum] || 'empty';
+                  // const status: TrackingStatus = tracking[habit.id]?.[dayNum] || 'empty';
                   return (
                     <td
                       key={dayNum}
-                      onClick={() => onToggleCell(habit.id, dayNum)}
+                      // onClick={() => onToggleCell(habit.id, dayNum)}
                       className="py-2 px-1 text-center border-r border-slate-200/80 dark:border-emerald-900/20 cursor-pointer select-none"
                     >
                       <button
