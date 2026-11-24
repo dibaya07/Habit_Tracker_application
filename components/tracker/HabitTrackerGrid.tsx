@@ -98,30 +98,30 @@ export const HabitTrackerGrid: React.FC = () => {
     return `${formatUtcShortDate(start)} – ${formatUtcFullDate(end)}`;
   }, [baseDate, tracker.durationDays]);
 
-  const onlineGraphDays: GraphDayPoint[] = useMemo(
-    () =>
-      visibleDays.map((dayNum) => {
-        const { dayNum: dateDay, dayName } = getDateLabel(dayNum);
-        const hasAnyTrack = activeHabits.some((h) => {
-          const st = tracker.tracking[h.id]?.[dayNum];
-          return st === 'completed' || st === 'failed';
-        });
-        const completedCount = hasAnyTrack
-          ? activeHabits.reduce(
-              (acc, h) => acc + (tracker.tracking[h.id]?.[dayNum] === 'completed' ? 1 : 0),
-              0
-            )
-          : null;
+  // const onlineGraphDays: GraphDayPoint[] = useMemo(
+  //   () =>
+  //     visibleDays.map((dayNum) => {
+  //       const { dayNum: dateDay, dayName } = getDateLabel(dayNum);
+  //       const hasAnyTrack = activeHabits.some((h) => {
+  //         // const st = tracker.tracking[h.id]?.[dayNum];
+  //         return st === 'completed' || st === 'failed';
+  //       });
+  //       const completedCount = hasAnyTrack
+  //         ? activeHabits.reduce(
+  //             // (acc, h) => acc + (tracker.tracking[h.id]?.[dayNum] === 'completed' ? 1 : 0),
+  //             0
+  //           )
+  //         : null;
 
-        return {
-          dayNum,
-          topLabel: dayName,
-          bottomLabel: String(dateDay),
-          completedCount,
-        };
-      }),
-    [visibleDays, getDateLabel, activeHabits, tracker.tracking]
-  );
+  //       return {
+  //         dayNum,
+  //         topLabel: dayName,
+  //         bottomLabel: String(dateDay),
+  //         completedCount,
+  //       };
+  //     }),
+  //   [visibleDays, getDateLabel, activeHabits, tracker.tracking]
+  // );
 
   const handleNextDays = useCallback(() => {
     setDayOffset((prev) => Math.min(maxOffset, prev + daysPerPage));
@@ -383,7 +383,7 @@ export const HabitTrackerGrid: React.FC = () => {
               />
 
               {/* Auto-Calculated Live Progress Graph (Online Mode) */}
-              {showGraph && (
+              {/* {showGraph && (
                 <ProgressLineGraph
                   title="Daily Progress Graph"
                   subtitle={`Auto-plotted from your check-ins (${visibleStartDay}–${visibleEndDay})`}
@@ -400,7 +400,7 @@ export const HabitTrackerGrid: React.FC = () => {
                   minTableWidth={onlineMinWidth}
                   onRemoveGraph={() => setIncludeGraph(false)}
                 />
-              )}
+              )} */}
 
               {/* Grid Legend & Helper Note */}
               <div className="px-4 py-3 bg-slate-100 dark:bg-[#071912] border-t border-slate-200 dark:border-emerald-900/40 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600 dark:text-emerald-300/70">
