@@ -40,13 +40,13 @@ export default function SavedSheetsCard({
 
           const activeHabits = sheet.habits.filter((h) => h.active);
           let completedTicks = 0;
-          activeHabits.forEach((h) => {
-            for (let d = 1; d <= sheet.durationDays; d++) {
-              if (sheet.tracking[h.id]?.[d] === 'completed') {
-                completedTicks++;
-              }
-            }
-          });
+          // activeHabits.forEach((h) => {
+          //   for (let d = 1; d <= sheet.durationDays; d++) {
+          //     if (sheet.tracking[h.id]?.[d] === 'completed') {
+          //       completedTicks++;
+          //     }
+          //   }
+          // });
           const totalPossible = Math.max(1, activeHabits.length * sheet.durationDays);
           const rate = Math.round((completedTicks / totalPossible) * 100);
 
