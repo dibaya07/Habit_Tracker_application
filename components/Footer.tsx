@@ -58,13 +58,14 @@ export const Footer: React.FC = () => {
 
             <div className="w-[calc(50%-1rem)] sm:w-[calc((100%-4rem)/3)] space-y-3">
               <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-900 dark:text-emerald-300">
-                Habitora
+                Account &amp; Trust
               </h4>
               <ul className="space-y-2 text-slate-600 dark:text-emerald-100/70">
+                <li><Link href="/signin" className="hover:text-emerald-700 dark:hover:text-[#2fe196] transition-colors">Sign In</Link></li>
+                <li><Link href="/signup" className="hover:text-emerald-700 dark:hover:text-[#2fe196] transition-colors">Create Account</Link></li>
                 <li><span className="cursor-default">Privacy Centric</span></li>
                 <li><span className="cursor-default">Offline-Friendly</span></li>
                 <li><span className="cursor-default">No Telemetry / No Ads</span></li>
-                <li><span className="cursor-default">Made with Care</span></li>
               </ul>
             </div>
           </div>

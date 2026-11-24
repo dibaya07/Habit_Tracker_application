@@ -15,6 +15,7 @@ import {
   LogOut,
   MessageSquare,
   User,
+  UserPlus,
 } from 'lucide-react';
 import { UserAccount } from '@/lib/types/tracker';
 import DownloadAppButton from '@/components/pwa/DownloadAppButton';
@@ -148,25 +149,28 @@ export default function MobileMenu({
             </div>
           ) : (
             <div className="flex flex-col gap-2.5">
-              <button
-                type="button"
+              <Link
+                href="/signin"
                 onClick={() => {
+                  setIsAuthModalOpen(false);
                   setMobileMenuOpen(false);
-                  setIsAuthModalOpen(true);
                 }}
-                className="w-full min-h-[46px] inline-flex items-center justify-center gap-2 py-3 rounded-xl border border-slate-300 dark:border-emerald-500/30 text-slate-800 dark:text-emerald-200 font-semibold text-sm hover:bg-slate-50 dark:hover:bg-emerald-950/40 transition-colors cursor-pointer"
+                className="w-full min-h-[46px] inline-flex items-center justify-center gap-2 py-3 rounded-xl border border-slate-300 dark:border-emerald-500/30 text-slate-800 dark:text-emerald-200 font-semibold text-sm hover:bg-slate-50 dark:hover:bg-emerald-950/40 transition-colors"
               >
                 <LogIn className="w-4 h-4" />
                 <span>Sign In</span>
-              </button>
+              </Link>
 
               <Link
-                href="/create_tracker"
-                prefetch={false}
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full min-h-[46px] inline-flex items-center justify-center py-3 rounded-xl bg-[#183f2e] dark:bg-[#2fe196] text-white dark:text-[#071912] font-semibold text-sm transition-colors"
+                href="/signup"
+                onClick={() => {
+                  setIsAuthModalOpen(false);
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full min-h-[46px] inline-flex items-center justify-center gap-2 py-3 rounded-xl bg-[#183f2e] dark:bg-[#2fe196] text-white dark:text-[#071912] font-semibold text-sm transition-colors"
               >
-                Get Started
+                <UserPlus className="w-4 h-4" />
+                <span>Sign Up</span>
               </Link>
             </div>
           )}

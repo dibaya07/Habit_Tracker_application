@@ -22,6 +22,7 @@ import {
   parseUtcDate,
 } from '../utils/date';
 import { applyAutoMissedDays, getDaysElapsedForIndex } from '../utils/auto-missed';
+import { validateEmailAddress, validatePersonName } from '../utils/validation';
 
 interface HabitTrackerContextType {
   hasMounted: boolean;
@@ -71,6 +72,21 @@ interface HabitTrackerContextType {
   resetTrackerData: () => void;
   // Auth operations
   quickSignIn: () => boolean;
+  signInWithGoogleAccount: (profile: {
+    name: string;
+    email: string;
+    avatarUrl?: string;
+  }) => boolean;
+  signUpWithEmail: (input: {
+    name: string;
+    email: string;
+    password: string;
+    dailyGoal?: string;
+  }) => Promise<{ ok: boolean; error?: string }>;
+  signInWithEmail: (input: {
+    email: string;
+    password: string;
+  }) => Promise<{ ok: boolean; error?: string }>;
   updateUserProfile: (updates: Partial<UserAccount>) => void;
   initiateEmailVerification: (email: string, name?: string) => Promise<boolean>;
   verifyEmailCode: (code: string) => boolean;
@@ -150,6 +166,30 @@ function readStoredJson<T>(key: string, fallback: T): T {
   } catch {
     return fallback;
   }
+}
+
+interface StoredLocalAccount {
+  name: string;
+  email: string;
+  passwordHash: string;
+  dailyGoal?: string;
+  createdAt: string;
+}
+
+async function hashCredential(value: string): Promise<string> {
+  if (typeof window !== 'undefined' && window.crypto?.subtle) {
+    const encoded = new TextEncoder().encode(`habitora_v1:${value}`);
+    const digest = await window.crypto.subtle.digest('SHA-256', encoded);
+    return Array.from(new Uint8Array(digest))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+  }
+  let hash = 2166136261;
+  for (let i = 0; i < value.length; i++) {
+    hash ^= value.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return `fnv_${(hash >>> 0).toString(16)}`;
 }
 
 export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -631,6 +671,8 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
       localStorage.setItem('habitora_user', JSON.stringify(newUser));
     } catch {}
 
+    appendHistory('signed_in', 'Signed In', 'Signed in via Quick Access workspace');
+
     const pendingAction = pendingAuthCallbackRef.current;
     pendingAuthCallbackRef.current = null;
     setAuthPromptMessage(null);
@@ -641,13 +683,192 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
       return true;
     }
     return false;
-  }, []);
+  }, [appendHistory]);
+
+  const signInWithGoogleAccount = useCallback(
+    (profile: { name: string; email: string; avatarUrl?: string }): boolean => {
+      const emailCheck = validateEmailAddress(profile.email || '');
+      const cleanEmail = emailCheck.valid ? emailCheck.value : profile.email.trim().toLowerCase();
+      const nameCheck = validatePersonName(profile.name || '');
+      const cleanName = nameCheck.valid
+        ? nameCheck.value
+        : profile.name.replace(/[^\p{L}\s'’.-]/gu, '').trim() || 'Google Member';
+
+      const existingStored = readStoredJson<UserAccount | null>('habitora_user', null);
+      const googleUser: UserAccount = {
+        email: cleanEmail,
+        name: cleanName,
+        isVerified: true,
+        avatarUrl: profile.avatarUrl,
+        createdAt: existingStored?.createdAt || new Date().toISOString(),
+        memberTier: existingStored?.memberTier || 'Pro',
+        dailyGoal: existingStored?.dailyGoal || 'Complete all daily habits consistently',
+        bio: existingStored?.bio || 'Building daily discipline and tracking progress one day at a time.',
+      };
+
+      setUser(googleUser);
+      try {
+        localStorage.setItem('habitora_user', JSON.stringify(googleUser));
+      } catch {}
+
+      appendHistory('signed_in', 'Signed In', `Signed in with Google (${cleanEmail})`);
+
+      const pendingAction = pendingAuthCallbackRef.current;
+      pendingAuthCallbackRef.current = null;
+      setAuthPromptMessage(null);
+      setIsAuthModalOpenState(false);
+
+      if (pendingAction) {
+        pendingAction();
+        return true;
+      }
+      return false;
+    },
+    [appendHistory]
+  );
+
+  const signUpWithEmail = useCallback(
+    async (input: {
+      name: string;
+      email: string;
+      password: string;
+      dailyGoal?: string;
+    }): Promise<{ ok: boolean; error?: string }> => {
+      const nameCheck = validatePersonName(input.name);
+      if (!nameCheck.valid) {
+        return { ok: false, error: nameCheck.error || 'Please enter a valid full name.' };
+      }
+
+      const emailCheck = validateEmailAddress(input.email);
+      if (!emailCheck.valid) {
+        return { ok: false, error: emailCheck.error || 'Please enter a valid email address.' };
+      }
+
+      const cleanName = nameCheck.value;
+      const cleanEmail = emailCheck.value;
+      const cleanGoal = input.dailyGoal?.trim();
+
+      if (input.password.length < 6) {
+        return { ok: false, error: 'Password must be at least 6 characters.' };
+      }
+
+      const accounts = readStoredJson<StoredLocalAccount[]>('habitora_accounts', []);
+      if (accounts.some((acc) => acc.email.toLowerCase() === cleanEmail)) {
+        return { ok: false, error: 'An account with this email already exists. Please sign in instead.' };
+      }
+
+      const passwordHash = await hashCredential(input.password);
+      const createdAt = new Date().toISOString();
+      const nextAccount: StoredLocalAccount = {
+        name: cleanName,
+        email: cleanEmail,
+        passwordHash,
+        dailyGoal: cleanGoal || 'Complete daily habits consistently',
+        createdAt,
+      };
+
+      try {
+        localStorage.setItem('habitora_accounts', JSON.stringify([nextAccount, ...accounts]));
+      } catch {}
+
+      const newUser: UserAccount = {
+        email: cleanEmail,
+        name: cleanName,
+        isVerified: true,
+        createdAt,
+        memberTier: 'Pro',
+        dailyGoal: nextAccount.dailyGoal,
+        bio: 'Building daily discipline and tracking progress one day at a time.',
+      };
+
+      setUser(newUser);
+      try {
+        localStorage.setItem('habitora_user', JSON.stringify(newUser));
+      } catch {}
+
+      appendHistory('account_created', 'Created Account', `Created Habitora account for ${cleanEmail}`);
+
+      const pendingAction = pendingAuthCallbackRef.current;
+      pendingAuthCallbackRef.current = null;
+      setAuthPromptMessage(null);
+      setIsAuthModalOpenState(false);
+      if (pendingAction) pendingAction();
+
+      return { ok: true };
+    },
+    [appendHistory]
+  );
+
+  const signInWithEmail = useCallback(
+    async (input: {
+      email: string;
+      password: string;
+    }): Promise<{ ok: boolean; error?: string }> => {
+      const emailCheck = validateEmailAddress(input.email);
+      if (!emailCheck.valid) {
+        return { ok: false, error: emailCheck.error || 'Please enter a valid email address.' };
+      }
+      const cleanEmail = emailCheck.value;
+      if (!input.password) {
+        return { ok: false, error: 'Please enter your password.' };
+      }
+
+      const accounts = readStoredJson<StoredLocalAccount[]>('habitora_accounts', []);
+      const existing = accounts.find((acc) => acc.email.toLowerCase() === cleanEmail);
+      if (!existing) {
+        return { ok: false, error: 'No account found with this email. Please create an account first.' };
+      }
+
+      const candidateHash = await hashCredential(input.password);
+      if (candidateHash !== existing.passwordHash) {
+        return { ok: false, error: 'Incorrect password. Please try again.' };
+      }
+
+      const loggedInUser: UserAccount = {
+        email: existing.email,
+        name: existing.name,
+        isVerified: true,
+        createdAt: existing.createdAt,
+        memberTier: 'Pro',
+        dailyGoal: existing.dailyGoal || 'Complete all daily habits consistently',
+        bio: 'Building daily discipline and tracking progress one day at a time.',
+      };
+
+      setUser(loggedInUser);
+      try {
+        localStorage.setItem('habitora_user', JSON.stringify(loggedInUser));
+      } catch {}
+
+      appendHistory('signed_in', 'Signed In', `Signed in as ${existing.email}`);
+
+      const pendingAction = pendingAuthCallbackRef.current;
+      pendingAuthCallbackRef.current = null;
+      setAuthPromptMessage(null);
+      setIsAuthModalOpenState(false);
+      if (pendingAction) pendingAction();
+
+      return { ok: true };
+    },
+    [appendHistory]
+  );
 
   const updateUserProfile = useCallback(
     (updates: Partial<UserAccount>) => {
+      const normalizedUpdates: Partial<UserAccount> = { ...updates };
+      if (updates.name !== undefined) {
+        const nameCheck = validatePersonName(updates.name);
+        if (!nameCheck.valid) return;
+        normalizedUpdates.name = nameCheck.value;
+      }
+      if (updates.email !== undefined) {
+        const emailCheck = validateEmailAddress(updates.email);
+        if (!emailCheck.valid) return;
+        normalizedUpdates.email = emailCheck.value;
+      }
+
       setUser((prev) => {
         if (!prev) return prev;
-        const updated = { ...prev, ...updates };
+        const updated = { ...prev, ...normalizedUpdates };
         try {
           localStorage.setItem('habitora_user', JSON.stringify(updated));
         } catch {}
@@ -976,6 +1197,9 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
       extendPlan,
       resetTrackerData,
       quickSignIn,
+      signInWithGoogleAccount,
+      signUpWithEmail,
+      signInWithEmail,
       updateUserProfile,
       initiateEmailVerification,
       verifyEmailCode,
@@ -1019,6 +1243,9 @@ export const HabitTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ 
       extendPlan,
       resetTrackerData,
       quickSignIn,
+      signInWithGoogleAccount,
+      signUpWithEmail,
+      signInWithEmail,
       updateUserProfile,
       initiateEmailVerification,
       verifyEmailCode,

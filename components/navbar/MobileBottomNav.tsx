@@ -16,7 +16,7 @@ import IconTooltip from '@/components/ui/IconTooltip';
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
-  const { hasMounted, user, setIsAuthModalOpen } = useHabitTracker();
+  const { hasMounted, user } = useHabitTracker();
   const isSignedIn = hasMounted && Boolean(user);
 
   const primaryHref = isSignedIn ? '/dashboard' : '/';
@@ -128,17 +128,20 @@ export default function MobileBottomNav() {
             <span className="text-[10px] leading-none whitespace-nowrap">Profile</span>
           </Link>
         ) : (
-          <button
-            type="button"
-            title="Sign In to Habitora"
-            onClick={() => setIsAuthModalOpen(true)}
-            className="flex-1 min-h-[44px] flex flex-col items-center justify-center gap-0.5 text-slate-500 dark:text-emerald-200/70 hover:text-[#183f2e] dark:hover:text-[#2fe196] transition-colors cursor-pointer touch-manipulation"
+          <Link
+            href="/signin"
+            title="Sign In or Create Account"
+            className={`flex-1 min-h-[44px] flex flex-col items-center justify-center gap-0.5 transition-colors touch-manipulation ${
+              pathname === '/signin' || pathname === '/signup'
+                ? 'text-[#183f2e] dark:text-[#2fe196] font-semibold'
+                : 'text-slate-500 dark:text-emerald-200/70 hover:text-[#183f2e] dark:hover:text-[#2fe196]'
+            }`}
           >
             <IconTooltip label="Sign In to Habitora" position="top">
               <User className="w-5 h-5" />
             </IconTooltip>
             <span className="text-[10px] leading-none whitespace-nowrap">Sign In</span>
-          </button>
+          </Link>
         )}
       </div>
     </nav>

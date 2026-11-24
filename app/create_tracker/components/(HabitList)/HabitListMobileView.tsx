@@ -5,7 +5,7 @@ import { useSheetContext } from "../../context/context";
 
 interface HabitListMobileViewProps {
   selectedHabits: Habit[];
-  handleRemoveHabit: (id: string) => void;
+  handleRemoveHabit: (id: string | undefined) => void;
 }
 
 export default function HabitListMobileView({
