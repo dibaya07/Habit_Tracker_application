@@ -12,74 +12,64 @@ import React, { useContext, useState } from "react";
 import { SheetContext, useSheetContext } from "../../context/context";
 
 interface DesktopViewHabitListProps {
-  startDate: string;
-  selectedHabits: Habit[];
   handleRemoveHabit: (id: string | undefined) => void;
-  checkedCells?: Record<string, boolean>;
-  setCheckedCells?: React.Dispatch<
-    React.SetStateAction<Record<string, boolean>>
-  >;
-  setPlottedZeroDays?: React.Dispatch<
-    React.SetStateAction<Record<number, boolean>>
-  >;
+  // setPlottedZeroDays?: React.Dispatch<
+  //   React.SetStateAction<Record<number, boolean>>
+  // >;
 }
 
 export default function DesktopViewHabitList({
-  selectedHabits,
   handleRemoveHabit,
-  checkedCells: externalCheckedCells,
-  setCheckedCells: externalSetCheckedCells,
-  setPlottedZeroDays: externalSetPlottedZeroDays,
-  startDate,
+  // setPlottedZeroDays: externalSetPlottedZeroDays,
 }: DesktopViewHabitListProps) {
   const {
-    dayLabelMode,
+    selectedHabits,
     visibleDayCount,
     extraDaysCount,
     confirmDeleteHabitId,
     setConfirmDeleteHabitId,
+    checkedCells, setCheckedCells
   } = useSheetContext();
 
   const daysArray = Array.from({ length: visibleDayCount }, (_, i) => i + 1);
 
-  const [internalCheckedCells, setInternalCheckedCells] = useState<
-    Record<string, boolean>
-  >({});
-  const [internalPlottedZeroDays, setInternalPlottedZeroDays] = useState<
-    Record<number, boolean>
-  >({});
-  const checkedCells = externalCheckedCells ?? internalCheckedCells;
+ 
+  // const [internalPlottedZeroDays, setInternalPlottedZeroDays] = useState<
+  //   Record<number, boolean>
+  // >({});
+  // const checkedCells = externalCheckedCells ?? internalCheckedCells;
 
-  const setCheckedCells = externalSetCheckedCells ?? setInternalCheckedCells;
-  const setPlottedZeroDays =
-    externalSetPlottedZeroDays ?? setInternalPlottedZeroDays;
+  // const setCheckedCells = externalSetCheckedCells ?? setInternalCheckedCells;
+  // const setPlottedZeroDays =
+  //   externalSetPlottedZeroDays ?? setInternalPlottedZeroDays;
 
-  const baseDate = parseUtcDate(startDate);
+  // const baseDate = parseUtcDate(startDate);
   // const formattedStartDate = formatUtcFullDate(baseDate);
 
-  const getDayHeader = (dayNum: number) => {
-    if (dayLabelMode === "numbers") {
-      return {
-        top: "",
-        bottom: String(dayNum),
-      };
-    }
-    const d = addUtcDays(baseDate, dayNum - 1);
-    return {
-      top: getUtcWeekdayNarrow(d),
-      bottom: String(getUtcDayNumber(d)),
-    };
-  };
+  // const getDayHeader = (dayNum: number) => {
+  //   if (dayLabelMode === "numbers") {
+  //     return {
+  //       top: "",
+  //       bottom: String(dayNum),
+  //     };
+  //   }
+  //   const d = addUtcDays(baseDate, dayNum - 1);
+  //   return {
+  //     top: getUtcWeekdayNarrow(d),
+  //     bottom: String(getUtcDayNumber(d)),
+  //   };
+  // };
 
   const toggleCell = (habitId: string | undefined, dayNum: number) => {
     const key = `${habitId}-${dayNum}`;
+    // console.log('key', key)
     setCheckedCells((prev) => ({ ...prev, [key]: !prev[key] }));
-    setPlottedZeroDays((prev) => {
-      if (!prev[dayNum]) return prev;
-      const copy = { ...prev };
-      delete copy[dayNum];
-      return copy;
-    });
+    // setPlottedZeroDays((prev) => {
+    //   if (!prev[dayNum]) return prev;
+    //   const copy = { ...prev };
+    //   delete copy[dayNum];
+    //   return copy;
+    // });
   };
 
   return (
@@ -104,19 +94,19 @@ export default function DesktopViewHabitList({
             </th>
 
             {daysArray.map((dayNum) => {
-              const { top, bottom } = getDayHeader(dayNum);
+              // const { top, bottom } = getDayHeader(dayNum);
               return (
                 <th
                   key={dayNum}
                   className="py-2.5 px-1.5 text-center font-mono tabular-nums border-r border-slate-100 dark:border-emerald-900/20 last:border-r-0 align-middle"
                 >
-                  {top && (
+                  {/* {top && (
                     <span className="block text-[9px] uppercase text-slate-400 dark:text-emerald-400/70 leading-none mb-0.5">
                       {top}
                     </span>
-                  )}
+                  )} */}
                   <span className="text-xs font-bold text-slate-800 dark:text-white leading-none block">
-                    {bottom}
+                    {dayNum}
                   </span>
                 </th>
               );
@@ -150,6 +140,8 @@ export default function DesktopViewHabitList({
                     </span>
                   </div>
 
+
+                {/* Delete button */}
                   {confirmDeleteHabitId === habit.id ? (
                     <div className="no-print flex items-center gap-1 shrink-0">
                       <button
@@ -192,6 +184,9 @@ export default function DesktopViewHabitList({
                 const isChecked = Boolean(
                   checkedCells[`${habit.id}-${dayNum}`],
                 );
+                // console.log("habitId", habit.id )
+                // console.log('isChecked', isChecked)
+
                 return (
                   <td
                     key={dayNum}

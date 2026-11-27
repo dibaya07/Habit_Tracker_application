@@ -5,17 +5,25 @@ import { formatUtcFullDate, parseUtcDate } from "@/lib/utils/date";
 import React, { useContext } from "react";
 import { SheetContext, useSheetContext } from "../../context/context";
 
-interface SheetHeaderProps {
-  startDate: string;
-}
+// interface SheetHeaderProps {
+//   startDate: string;
+// }
 
-export default function SheetHeader({
-  startDate,
-}: SheetHeaderProps) {
+export default function SheetHeader() {
+
+
   //  const sheetContext = useContext(SheetContext)
-   const {trackerName,dayLabelMode,setDayLabelMode } = useSheetContext()
-  const baseDate = parseUtcDate(startDate);
-  const formattedStartDate = formatUtcFullDate(baseDate);
+   const {trackerName, customStartDate } = useSheetContext()
+
+   const date = new Date(customStartDate)
+
+
+  // const baseDate = parseUtcDate(startDate);
+  const formattedStartDate = date.toLocaleDateString("en-GB",{
+    day:'numeric',
+    month:'short',
+    year:'numeric'
+  });
 
   return (
     <div className="px-4 sm:px-5 py-4 border-b border-slate-200 dark:border-emerald-900/50 bg-[#fafcf9] dark:bg-[#0b241b] flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
@@ -38,8 +46,7 @@ export default function SheetHeader({
             </div>
           )}
           <p className="text-xs text-slate-600 dark:text-emerald-300/75 font-mono tabular-nums">
-            Start: {formattedStartDate} · durationDays Days ·
-            selectedHabits.length Habits
+            Start: {formattedStartDate} 
           </p>
         </div>
       </div>
@@ -50,9 +57,9 @@ export default function SheetHeader({
           Day Labels:
         </span>
         <DayLabelDropdown
-          id="create-sheet-day-label-mode"
-          value={dayLabelMode}
-          onChange={setDayLabelMode}
+          // id="create-sheet-day-label-mode"
+          // value={dayLabelMode}
+          // onChange={setDayLabelMode}
         />
       </div>
     </div>

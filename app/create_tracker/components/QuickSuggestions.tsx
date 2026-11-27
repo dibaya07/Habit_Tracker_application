@@ -3,25 +3,37 @@
 import React from 'react';
 import { Check, Plus } from 'lucide-react';
 import { Habit, HabitCategory } from '@/lib/types/tracker';
+import { useSheetContext } from '../context/context';
 
-interface QuickSuggestionProps {
-  selectedHabits: Habit[];
-  handleSelectSuggestedHabit: (name: string, category: HabitCategory) => void;
-}
+// interface QuickSuggestionProps {
+//   selectedHabits: Habit[];
+//   handleSelectSuggestedHabit: (name: string) => void;
+// }
 
-const SUGGESTIONS: Array<{ name: string; cat: HabitCategory }> = [
-  { name: '10,000 Steps', cat: 'Health' },
-  { name: 'Cold Shower', cat: 'Wellness' },
-  { name: 'Journaling', cat: 'Wellness' },
-  { name: 'No Social Media before 10 AM', cat: 'Productivity' },
-  { name: 'Read 15 Pages', cat: 'Learning' },
-  { name: '8 Hours Sleep', cat: 'Health' },
+const SUGGESTIONS: Array<{ name: string}> = [
+  { name: '10,000 Steps',},
+  { name: 'Cold Shower',},
+  { name: 'Journaling',},
+  { name: 'No Social Media before 10 AM',},
+  { name: 'Read 15 Pages',},
+  { name: '8 Hours Sleep',},
 ];
 
-export default function QuickSuggestions({
-  selectedHabits,
-  handleSelectSuggestedHabit,
-}: QuickSuggestionProps) {
+export default function QuickSuggestions() {
+  const {selectedHabits, setSelectedHabits, newHabitName,setNewHabitName} = useSheetContext()
+
+    const handleSelectSuggestedHabit = (name: string) => {
+    if (selectedHabits.some((h) => h.name.toLowerCase() === name.toLowerCase()))
+      return;
+    const newHabit: Habit = {
+      // id: `sugg_${name.toLowerCase().replace(/\s+/g, "_")}_${Date.now()}`,
+      id: `h${name}`,
+      name,
+      // active: true,
+    };
+    // setSelectedHabits((prev) => [...prev, newHabit]);
+    setNewHabitName(name)
+  };
   return (
     <div className="pt-4 border-t border-slate-200 dark:border-emerald-900/40">
       <span className="text-xs font-semibold text-slate-600 dark:text-emerald-300 block mb-2.5">
@@ -29,16 +41,17 @@ export default function QuickSuggestions({
       </span>
       <div className="flex flex-wrap gap-2">
         {SUGGESTIONS.map((sugg) => {
-          const isAdded = selectedHabits.some(
-            (h) => h.name.toLowerCase() === sugg.name.toLowerCase()
-          );
+          // const isAdded = selectedHabits.some(
+          //   (h) => h.name.toLowerCase() === sugg.name.toLowerCase()
+          // );
+          const isAdded = Boolean(newHabitName.toLowerCase() === sugg.name.toLowerCase())
 
           return (
             <button
               key={sugg.name}
               type="button"
               disabled={isAdded}
-              onClick={() => handleSelectSuggestedHabit(sugg.name, sugg.cat)}
+              onClick={() => handleSelectSuggestedHabit(sugg.name)}
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors whitespace-nowrap shrink-0 ${
                 isAdded
                   ? 'bg-emerald-50 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-700/50 text-emerald-700 dark:text-[#2fe196] opacity-80 cursor-default'

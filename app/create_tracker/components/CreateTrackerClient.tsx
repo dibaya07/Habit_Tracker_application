@@ -27,17 +27,13 @@ const SheetPreviewModal = dynamic(
   },
 );
 
-interface CreateTrackerClientProps {
-  defaultHabits: Habit[];
-  initialName?: string;
-  initialDuration?: number;
-}
+// interface CreateTrackerClientProps {
+//   defaultHabits: Habit[];
+//   // initialName?: string;
+//   // initialDuration?: number;
+// }
 
-export default function CreateTrackerClient({
-  defaultHabits,
-  // initialName = "",
-  // initialDuration = 30,
-}: CreateTrackerClientProps) {
+export default function CreateTrackerClient() {
   const router = useRouter();
   const { createTracker, user, openAuthModal, quickSignIn, hasMounted } =
     useHabitTracker();
@@ -50,19 +46,18 @@ export default function CreateTrackerClient({
     effectiveDays,
     isSubmitting,
     setIsSubmitting,
+    selectedHabits, setSelectedHabits,checkedCells, setCheckedCells
   } = useSheetContext();
 
-  const startDate =
-    customStartDate ??
-    (hasMounted ? getLocalTodayYmd() : DEFAULT_DATE_FALLBACK);
-  const [selectedHabits, setSelectedHabits] = useState<Habit[]>(defaultHabits);
-  const [newHabitName, setNewHabitName] = useState("");
+  const startDate = customStartDate 
+  
+  // const [newHabitName, setNewHabitName] = useState("");
   const [showSignInPrompt, setShowSignInPrompt] = useState(false);
   const [previewMode, setPreviewMode] = useState<"sheet" | "graph" | null>(
     null,
   );
 
-  const [checkedCells, setCheckedCells] = useState<Record<string, boolean>>({});
+  // const [checkedCells, setCheckedCells] = useState<Record<string, boolean>>({});
   const [plottedZeroDays, setPlottedZeroDays] = useState<
     Record<number, boolean>
   >({});
@@ -72,16 +67,7 @@ export default function CreateTrackerClient({
     setSelectedHabits((prev) => prev.filter((h) => h.id !== id));
   };
 
-  const handleSelectSuggestedHabit = (name: string) => {
-    if (selectedHabits.some((h) => h.name.toLowerCase() === name.toLowerCase()))
-      return;
-    const newHabit: Habit = {
-      id: `sugg_${name.toLowerCase().replace(/\s+/g, "_")}_${Date.now()}`,
-      name,
-      active: true,
-    };
-    setSelectedHabits((prev) => [...prev, newHabit]);
-  };
+
 
   const handleDownloadSheet = () => {
     if (typeof window !== "undefined") {
@@ -162,26 +148,22 @@ export default function CreateTrackerClient({
                   id="create-tracker-sheet"
                   className="no-print rounded-2xl border border-[#dce8df] dark:border-emerald-900/50 bg-white dark:bg-[#081d15] shadow-xs overflow-hidden"
                 >
-                  <SheetHeader startDate={startDate} />
+                  <SheetHeader  />
                   <HabitListMobileView
                     selectedHabits={selectedHabits}
                     handleRemoveHabit={handleRemoveHabit}
                   />
                   <DesktopViewHabitList
-                    selectedHabits={selectedHabits}
                     handleRemoveHabit={handleRemoveHabit}
-                    checkedCells={checkedCells}
-                    setCheckedCells={setCheckedCells}
-                    setPlottedZeroDays={setPlottedZeroDays}
-                    startDate={startDate}
+                    // setPlottedZeroDays={setPlottedZeroDays}
                   />
                   <AddHabitBtn
-                    newHabitName={newHabitName}
-                    setNewHabitName={setNewHabitName}
+                    // newHabitName={newHabitName}
+                    // setNewHabitName={setNewHabitName}
                     // handleAddCustomHabit={handleAddCustomHabit}
                     selectedHabits={selectedHabits}
                     setSelectedHabits={setSelectedHabits}
-                    handleSelectSuggestedHabit={handleSelectSuggestedHabit}
+                    // handleSelectSuggestedHabit={handleSelectSuggestedHabit}
                   />
                   <GraphMobileView
                     onOpenPreview={(mode) => setPreviewMode(mode)}

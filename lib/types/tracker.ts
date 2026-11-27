@@ -10,7 +10,7 @@ export interface Habit {
   // category?: HabitCategory;
   // color?: string;
   // targetPerWeek?: number;
-  active: boolean;
+  // active: boolean;
 }
 
 export interface DayTracking {

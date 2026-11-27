@@ -1,14 +1,14 @@
-import { DayLabelMode } from "@/lib/types/tracker";
+import { DayLabelMode, Habit } from "@/lib/types/tracker";
 
 export interface contextType {
   trackerName: string;
   setTrackerName: React.Dispatch<React.SetStateAction<string>>;
   customDaysInput: string;
   setCustomDaysInput: React.Dispatch<React.SetStateAction<string>>;
-  customStartDate: string | null;
-  setCustomStartDate: React.Dispatch<React.SetStateAction<string | null>>;
-  dayLabelMode: DayLabelMode | undefined;
-  setDayLabelMode: React.Dispatch<React.SetStateAction<DayLabelMode>>;
+  customStartDate: string ;
+  setCustomStartDate: React.Dispatch<React.SetStateAction<string>>;
+  dayLabelMode: string;
+  setDayLabelMode: React.Dispatch<React.SetStateAction<string>>;
   includeGraph: boolean | undefined;
   setIncludeGraph: React.Dispatch<React.SetStateAction<boolean>>;
   visibleDayCount: number;
@@ -22,4 +22,10 @@ export interface contextType {
   setIsSubmitting: React.Dispatch<React.SetStateAction<boolean>>;
   confirmDeleteHabitId: string | null | undefined;
   setConfirmDeleteHabitId: React.Dispatch<React.SetStateAction<string | null | undefined>>;
+  selectedHabits : Habit[]
+  setSelectedHabits : React.Dispatch<React.SetStateAction<Habit[]>>;
+  checkedCells: Record<string, boolean>
+  setCheckedCells : React.Dispatch<React.SetStateAction<Record<string, boolean>>>
+  newHabitName : string
+  setNewHabitName : React.Dispatch<React.SetStateAction<string>>
 }

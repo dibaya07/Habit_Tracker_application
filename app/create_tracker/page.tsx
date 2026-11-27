@@ -30,13 +30,7 @@ export const metadata: Metadata = {
   },
 };
 
-const defaultHabits : Habit[] = [
-    { id: 'h1', name: 'Exercise', active: true, },
-    { id: 'h2', name: 'Meditation', active: true, },
-    { id: 'h3', name: 'Read a book', active: true, },
-    { id: 'h4', name: 'Drink water', active: true, },
-    { id: 'h5', name: 'Healthy food', active: true, },
-  ];
+
 
 export default async function CreateTrackerPage() {
 // export default async function CreateTrackerPage({searchParams,}: {searchParams: Promise<{ template?: string }>;}) {
@@ -46,7 +40,7 @@ export default async function CreateTrackerPage() {
   return (
    <SheetContextProvider>
      <CreateTrackerClient
-      defaultHabits={defaultHabits}
+      // defaultHabits={defaultHabits}
       //   matchedTemplate ? matchedTemplate.habits : SITE_CONFIG.defaultHabits
       // }
       // initialName={matchedTemplate ? matchedTemplate.title : ""}

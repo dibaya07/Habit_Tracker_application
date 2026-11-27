@@ -36,7 +36,7 @@ export default function TimePeriod() {
       <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#fafcf9] dark:bg-emerald-950/60 border border-[#dce8df] dark:border-emerald-900/50">
         {DURATION_OPTIONS.map((option) => {
           const isActive =
-            !isCustomDuration && selectedDuration === option.days;
+            isCustomDuration == false && selectedDuration === option.days;
           return (
             <button
               key={option.days}

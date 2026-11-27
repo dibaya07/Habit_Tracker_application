@@ -275,6 +275,7 @@ export default function DashboardOverview() {
           <div className="flex flex-wrap gap-3">
             {activeHabits.map((habit, idx) => {
               // const status = tracker.tracking[habit.id]?.[activeDayIndex] || 'empty';
+              // const status 
               const isDone = status === 'completed';
               return (
                 <button

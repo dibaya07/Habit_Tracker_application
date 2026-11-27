@@ -2,20 +2,22 @@
 
 import React from 'react';
 import { Plus, X } from 'lucide-react';
+import { useSheetContext } from '../context/context';
 
 interface CustomHabitFormProps {
   handleAddCustomHabit: (e: React.FormEvent) => void;
-  newHabitName: string;
-  setNewHabitName: (name: string) => void;
+  // newHabitName: string;
+  // setNewHabitName: (name: string) => void;
   onCancel: () => void;
 }
 
 export default function CustomHabitForm({
   handleAddCustomHabit,
-  newHabitName,
-  setNewHabitName,
+  // newHabitName,
+  // setNewHabitName,
   onCancel,
 }: CustomHabitFormProps) {
+  const {newHabitName, setNewHabitName,} = useSheetContext()
   return (
     <form
       onSubmit={handleAddCustomHabit}
@@ -34,11 +36,11 @@ export default function CustomHabitForm({
           autoFocus
           value={newHabitName}
           onChange={(e) => setNewHabitName(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') {
-              onCancel();
-            }
-          }}
+          // onKeyDown={(e) => {
+          //   if (e.key === 'Escape') {
+          //     onCancel();
+          //   }
+          // }}
           placeholder="Write habit name (e.g. Read 20 mins)..."
           className="w-full px-1 py-2 bg-transparent border-0 border-b-2 border-slate-300 dark:border-emerald-800/70 rounded-none text-slate-900 dark:text-white text-sm font-medium placeholder:text-slate-400 dark:placeholder:text-emerald-300/40 focus:outline-none focus:border-[#183f2e] dark:focus:border-[#2fe196] transition-colors"
         />

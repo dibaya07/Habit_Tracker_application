@@ -4,30 +4,31 @@ import CustomHabitForm from "../CustomHabitForm";
 import QuickSuggestions from "../QuickSuggestions";
 import { Habit, HabitCategory } from "@/lib/types/tracker";
 import { Plus, TrendingUp } from "lucide-react";
-import { SheetContext } from "../../context/context";
+import { SheetContext, useSheetContext } from "../../context/context";
 
 interface AddHabitBtnProps {
-  newHabitName: string;
-  setNewHabitName: (value: string) => void;
+  // newHabitName: string;
+  // setNewHabitName: (value: string) => void;
   // handleAddCustomHabit: (value: React.FormEvent) => void;
   selectedHabits: Habit[];
   setSelectedHabits:React.Dispatch<React.SetStateAction<Habit[]>>;
-  handleSelectSuggestedHabit: (name: string, category: HabitCategory) => void;
+  // handleSelectSuggestedHabit: (name: string, category: HabitCategory) => void;
   // includeGraph: boolean;
   // setIncludeGraph: (value: boolean) => void;
 }
 
 export default function AddHabitBtn({
-  newHabitName,
-  setNewHabitName,
+  // newHabitName,
+  // setNewHabitName,
   // handleAddCustomHabit,
   selectedHabits,
   setSelectedHabits,
-  handleSelectSuggestedHabit,
+  // handleSelectSuggestedHabit,
   // includeGraph,
   // setIncludeGraph,
 }: AddHabitBtnProps) {
-  const sheetContext = useContext(SheetContext);
+  // const sheetContext = useContext(SheetContext);
+  const {newHabitName, setNewHabitName,includeGraph, setIncludeGraph} = useSheetContext()
   const [isAddingHabit, setIsAddingHabit] = useState(false);
 
    const handleAddCustomHabit = (e: React.FormEvent) => {
@@ -35,25 +36,26 @@ export default function AddHabitBtn({
     if (!newHabitName.trim()) return;
     const newHabit: Habit = {
       name: newHabitName.trim(),
-      active: true,
+      // active: true,
     };
 
     setSelectedHabits((prev) => [...prev, newHabit]);
     setNewHabitName("");
+     setIsAddingHabit(false);
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
-    handleAddCustomHabit(e);
-    setIsAddingHabit(false);
-  };
+  // const handleFormSubmit = (e: React.FormEvent) => {
+  //   handleAddCustomHabit(e);
+  //   setIsAddingHabit(false);
+  // };
   return (
     <div className="no-print px-4 sm:px-5 py-3.5 border-t border-slate-200/80 dark:border-emerald-900/40 bg-[#fafcf9]/80 dark:bg-[#091f17]">
       {isAddingHabit ? (
         <div className="p-4 sm:p-5 rounded-2xl border border-[#dce8df] dark:border-emerald-900/50 bg-white dark:bg-emerald-950/30 space-y-4">
           <CustomHabitForm
-            handleAddCustomHabit={handleFormSubmit}
-            newHabitName={newHabitName}
-            setNewHabitName={setNewHabitName}
+            handleAddCustomHabit={handleAddCustomHabit}
+            // newHabitName={newHabitName}
+            // setNewHabitName={setNewHabitName}
             onCancel={() => {
               setNewHabitName("");
               setIsAddingHabit(false);
@@ -61,8 +63,8 @@ export default function AddHabitBtn({
           />
 
           <QuickSuggestions
-            selectedHabits={selectedHabits}
-            handleSelectSuggestedHabit={handleSelectSuggestedHabit}
+            // selectedHabits={selectedHabits}
+            // handleSelectSuggestedHabit={handleSelectSuggestedHabit}
           />
         </div>
       ) : (
@@ -77,10 +79,10 @@ export default function AddHabitBtn({
               <span>Add Habit</span>
             </button>
 
-            {!sheetContext?.includeGraph && (
+            {!includeGraph && (
               <button
                 type="button"
-                onClick={() => sheetContext?.setIncludeGraph(true)}
+                onClick={() => setIncludeGraph(true)}
                 className="flex-1 sm:flex-none min-h-[40px] inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-[#dce8df] dark:border-emerald-800/60 bg-white dark:bg-emerald-950/50 hover:border-[#183f2e] dark:hover:border-[#2fe196] text-xs font-semibold text-[#123524] dark:text-emerald-100 transition-colors cursor-pointer whitespace-nowrap"
               >
                 <TrendingUp className="w-4 h-4 text-[#183f2e] dark:text-[#2fe196]" />
